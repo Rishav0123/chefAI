@@ -11,9 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Run simple migration check
-print("Starting migration check...")
-try:
-    from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
