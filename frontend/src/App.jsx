@@ -17,13 +17,21 @@ import api from './api';
 const Dashboard = () => {
     const { user, stockRefreshTrigger } = React.useContext(UserContext);
     const [stockCount, setStockCount] = useState(0);
+    const [fetching, setFetching] = useState(true);
 
     // Fetch stock count for "Kitchen Capacity" metric
     useEffect(() => {
         if (user) {
+            setFetching(true);
             api.get(`/stock/${user.id}`)
-                .then(res => setStockCount(res.data.length))
-                .catch(err => console.error(err));
+                .then(res => {
+                    setStockCount(res.data.length);
+                    setFetching(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setFetching(false);
+                });
         }
     }, [user, stockRefreshTrigger]);
 
@@ -138,7 +146,11 @@ const Dashboard = () => {
                     <div className="flex justify-between items-end mb-6">
                         <div>
                             <h3 className="text-stone-400 text-sm font-bold uppercase tracking-widest mb-2">Pantry Status</h3>
-                            <div className="text-5xl font-black text-accent mb-1">{efficiency}<span className="text-2xl text-white ml-1">% Capacity</span></div>
+                            {fetching ? (
+                                <div className="text-3xl font-bold text-stone-500 mb-1 animate-pulse">Syncing...</div>
+                            ) : (
+                                <div className="text-5xl font-black text-accent mb-1">{efficiency}<span className="text-2xl text-white ml-1">% Capacity</span></div>
+                            )}
                             <p className="text-stone-500 text-sm font-medium">Auto-calculated based on {stockCount} items.</p>
                         </div>
                         <div className="hidden md:block">
@@ -189,8 +201,19 @@ const AppContent = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+            <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center p-4">
+                <div className="relative w-24 h-24 mb-6">
+                    <div className="absolute inset-0 border-4 border-stone-800 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-accent rounded-full border-t-transparent animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center text-accent">
+                        <ChefHat size={32} />
+                    </div>
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2 animate-pulse">Waking up AI Chef...</h2>
+                <p className="text-stone-500 text-sm max-w-xs text-center">
+                    The server sleeps when idle to save energy. This might take up to 60 seconds.
+                    <br /><span className="text-accent/80 text-xs mt-2 block">Thanks for your patience! 🥣</span>
+                </p>
             </div>
         );
     }
