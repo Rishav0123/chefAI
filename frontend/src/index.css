@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-950 text-stone-50 font-sans min-h-screen selection:bg-accent selection:text-white;
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.08) 0%, transparent 25%),
+      radial-gradient(circle at 0% 100%, #1c1917 0%, transparent 50%);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply backdrop-blur-md border border-white/10 bg-[#1c1917]/70 shadow-xl rounded-3xl transition-all duration-300;
+  }
+
+  .card-hero {
+    @apply bg-[#1c1917] rounded-[48px] p-8 md:p-12 border border-white/5 relative overflow-hidden;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white px-6 py-3 rounded-2xl font-bold transition-all hover:bg-accent-hover hover:-translate-y-0.5 shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 active:scale-95;
+  }
+
+  .btn-glass {
+    @apply bg-white/5 border border-white/10 text-stone-50 px-6 py-3 rounded-2xl font-semibold transition-all hover:bg-white/10 active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-stone-950/60 border border-white/10 rounded-2xl text-stone-50 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-stone-600;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
