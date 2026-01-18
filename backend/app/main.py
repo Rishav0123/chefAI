@@ -11,10 +11,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Run simple migration check
-check_and_migrate_meals_table(engine)
+print("Starting migration check...")
+try:
+    check_and_migrate_meals_table(engine)
+    print("Migration check completed.")
+except Exception as e:
+    print(f"Migration check failed: {e}")
 
 # Create tables
-base.Base.metadata.create_all(bind=engine)
+print("Starting table creation...")
+try:
+    base.Base.metadata.create_all(bind=engine)
+    print("Table creation completed.")
+except Exception as e:
+    print(f"Table creation failed: {e}")
 
 app = FastAPI(title="Kitchen Buddy API")
 
