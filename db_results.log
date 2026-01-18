@@ -1,0 +1,34 @@
+Starting connectivity tests...
+
+--- Testing: Pooler | Transaction Mode (6543) | User: chef_app ---
+Host: aws-1-ap-southeast-1.pooler.supabase.com
+Port: 6543
+User: chef_app.sscsezhmmklsxqhgesyn
+✅ SUCCESS!
+
+--- Testing: Pooler | Session Mode (5432) | User: chef_app ---
+Host: aws-1-ap-southeast-1.pooler.supabase.com
+Port: 5432
+User: chef_app.sscsezhmmklsxqhgesyn
+✅ SUCCESS!
+
+--- Testing: Pooler | Transaction Mode (6543) | User: postgres ---
+Host: aws-1-ap-southeast-1.pooler.supabase.com
+Port: 6543
+User: postgres.sscsezhmmklsxqhgesyn
+✅ SUCCESS!
+
+--- Testing: Pooler | Session Mode (5432) | User: postgres ---
+Host: aws-1-ap-southeast-1.pooler.supabase.com
+Port: 5432
+User: postgres.sscsezhmmklsxqhgesyn
+✅ SUCCESS!
+
+--- Testing: Direct | Standard (5432) | User: postgres ---
+Host: db.sscsezhmmklsxqhgesyn.supabase.co
+Port: 5432
+User: postgres
+❌ FAILED: connection to server at "db.sscsezhmmklsxqhgesyn.supabase.co" (2406:da18:243:7420:3cd4:d4dd:e2c:3395), port 5432 failed: timeout expired
+
+RESULTS: 4 passed out of 5
+At least one config worked!

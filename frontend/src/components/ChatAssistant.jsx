@@ -29,7 +29,7 @@ const ChatAssistant = () => {
 
                 setMessages([{ role: 'assistant', content: greeting }]);
             } catch (err) {
-                setMessages([{ role: 'assistant', content: "Hi! I am your AI Chef. Ask me what to cook!" }]);
+                setMessages([{ role: 'assistant', content: "Hi! I am your AI Chef. I can help you plan meals, track nutrition, or find recipes based on what you have.\n\n**What would you like to cook today?**" }]);
             }
         };
 
@@ -158,6 +158,26 @@ const ChatAssistant = () => {
                                     <Play size={12} fill="currentColor" />
                                     Show me video
                                 </button>
+                            )}
+
+                            {/* Quick Prompts - Only show after the very first assistant message */}
+                            {idx === 0 && msg.role === 'assistant' && (
+                                <div className="mt-4 flex flex-wrap gap-2 animate-fade-in">
+                                    {[
+                                        "What can I cook with my stock?",
+                                        "Suggest a healthy dinner",
+                                        "Show me a pasta recipe",
+                                        "How do I scan a bill?"
+                                    ].map((prompt, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setInput(prompt)}
+                                            className="px-4 py-2 bg-stone-800/50 hover:bg-stone-700 border border-white/10 rounded-xl text-sm text-stone-300 transition-all hover:text-white hover:border-accent/50 text-left"
+                                        >
+                                            {prompt}
+                                        </button>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     );
