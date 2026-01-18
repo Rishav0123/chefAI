@@ -50,7 +50,12 @@ app = FastAPI(title="Kitchen Buddy API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all for mobile testing
+    allow_origins=[
+        "http://localhost:5173",
+        "https://chef-jfngtelpf-rishavs-projects-42db2f67.vercel.app",
+        "https://chef-n61hg7esr-rishavs-projects-42db2f67.vercel.app",
+        "https://chefai-m270.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

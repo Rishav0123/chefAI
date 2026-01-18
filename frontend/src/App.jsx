@@ -13,6 +13,7 @@ import MealHistory from './components/MealHistory';
 import ProfileModal from './components/ProfileModal';
 import ScanMethod from './components/ScanMethod';
 import api from './api';
+import HeroGraphic from './assets/how_it_works_graphic.png';
 
 const Dashboard = () => {
     const { user, stockRefreshTrigger } = React.useContext(UserContext);
@@ -46,28 +47,39 @@ const Dashboard = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10 pointer-events-none"></div>
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-[10s]"></div>
 
-                <div className="relative z-20 max-w-2xl">
-                    <div className="inline-flex items-center bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-500/20 text-accent text-xs font-bold uppercase tracking-widest mb-6">
-                        <span className="relative flex h-2 w-2 mr-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-                        </span>
-                        AI Chef v2.0
+                <div className="relative z-20 container mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div className="max-w-2xl text-left">
+                        <div className="inline-flex items-center bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-500/20 text-accent text-xs font-bold uppercase tracking-widest mb-6">
+                            <span className="relative flex h-2 w-2 mr-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                            </span>
+                            AI Chef v2.0
+                        </div>
+
+                        <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
+                            Elevate Your <br /><span className="text-accent">Culinary Art.</span>
+                        </h1>
+
+                        <p className="text-xl text-stone-300 mb-10 font-medium leading-relaxed max-w-lg opacity-90">
+                            AI-powered inventory tracking and chef-grade recipe generation at your fingertips.
+                        </p>
+
+                        <div>
+                            <Link to="/chat" className="btn-glass inline-flex items-center gap-3 px-8 py-4 text-lg">
+                                <Sparkles size={24} className="text-accent" />
+                                Ask Chef AI
+                            </Link>
+                        </div>
                     </div>
 
-                    <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
-                        Elevate Your <br /><span className="text-accent">Culinary Art.</span>
-                    </h1>
-
-                    <p className="text-xl text-stone-300 mb-10 font-medium leading-relaxed max-w-lg opacity-90">
-                        AI-powered inventory tracking and chef-grade recipe generation at your fingertips.
-                    </p>
-
-                    <div>
-                        <Link to="/chat" className="btn-glass inline-flex items-center gap-3 px-8 py-4 text-lg">
-                            <Sparkles size={24} className="text-accent" />
-                            Ask Chef AI
-                        </Link>
+                    {/* Hero Graphic */}
+                    <div className="hidden md:block max-w-[500px] w-full animate-fade-in-up delay-200">
+                        <img
+                            src={HeroGraphic}
+                            alt="AI Chef Workflow"
+                            className="w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-700"
+                        />
                     </div>
                 </div>
             </section>
