@@ -13,20 +13,42 @@ load_dotenv()
 # Run simple migration check
 print("Starting migration check...")
 try:
-    check_and_migrate_meals_table(engine)
-    print("Migration check completed.")
-except Exception as e:
-    print(f"Migration check failed: {e}")
+    from contextlib import asynccontextmanager
 
-# Create tables
-print("Starting table creation...")
-try:
-    base.Base.metadata.create_all(bind=engine)
-    print("Table creation completed.")
-except Exception as e:
-    print(f"Table creation failed: {e}")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Run migrations and create tables
+    print("Starting migration check...", flush=True)
+    
+    # DEBUG: Print connection details to debug Render config
+    db_url = os.getenv("DATABASE_URL", "")
+    if "@" in db_url:
+        # Extract and print just the user/host part, hiding password
+        user_host = db_url.split("@")[1]
+        user_part = db_url.split("@")[0].split("//")[1]
+        username = user_part.split(":")[0]
+        print(f"DEBUG: Connecting as User: '{username}' to Host: '{user_host}'", flush=True)
+    else:
+        print(f"DEBUG: DATABASE_URL not standard format: {db_url[:10]}...", flush=True)
 
-app = FastAPI(title="Kitchen Buddy API")
+    try:
+        check_and_migrate_meals_table(engine)
+        print("Migration check completed.", flush=True)
+    except Exception as e:
+        print(f"Migration check failed: {e}", flush=True)
+
+    print("Starting table creation...", flush=True)
+    try:
+        base.Base.metadata.create_all(bind=engine)
+        print("Table creation completed.", flush=True)
+    except Exception as e:
+        print(f"Table creation failed: {e}", flush=True)
+    
+    yield
+    # Shutdown: Clean up resources if needed (e.g., db connections)
+    print("Shutting down...", flush=True)
+
+app = FastAPI(title="Kitchen Buddy API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
