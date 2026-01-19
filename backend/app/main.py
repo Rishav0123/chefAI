@@ -54,6 +54,7 @@ app.add_middleware(
         "http://localhost:5173",
         "https://chef-jfngtelpf-rishavs-projects-42db2f67.vercel.app",
         "https://chef-n61hg7esr-rishavs-projects-42db2f67.vercel.app",
+        "https://chef-ai-beryl.vercel.app",
         "https://chefai-m270.onrender.com"
     ],
     allow_credentials=True,
