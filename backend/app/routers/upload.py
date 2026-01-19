@@ -27,13 +27,17 @@ def process_upload_background(job_id: str, contents: bytes, user_id: str, upload
         
         if upload_type == "meal":
             extracted_data = extract_meal_from_image(contents, mime_type=content_type)
+            if not extracted_data:
+                 raise Exception("AI Extraction failed. Could not identify meal.")
         else:
             extracted_data = extract_items_from_image(contents, mime_type=content_type)
+            # If "error" key exists in dict, it means OpenAI failed hard
+            if isinstance(extracted_data, dict) and extracted_data.get("error"):
+                 raise Exception(f"AI Error: {extracted_data['error']}")
             
         print(f"[Job {job_id}] OpenAI Result: {extracted_data}")
         
-        if not extracted_data:
-             raise Exception("AI Extraction failed. The image might be unclear or empty.")
+        # REMOVED: strict empty check. We now allow empty results (0 items found).
 
         # 3. Upload to Supabase Storage
         print(f"[Job {job_id}] Uploading to Supabase Storage...")

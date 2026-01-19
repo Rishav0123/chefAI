@@ -13,24 +13,31 @@ def encode_image(image_file):
 
 def extract_items_from_image(image_bytes, mime_type="image/jpeg"):
     """
-    Sends image to OpenAI Vision API and returns list of extracted items.
+    Sends image to OpenAI Vision API and returns extracted items with confidence.
     """
     base64_image = encode_image(image_bytes)
     
     prompt = """
-    You are a kitchen assistant. Analyze this image (which could be a grocery bill, an online shopping cart screenshot, or a photo of ingredients).
-    Extract all food/grocery items found.
-    Ignore prices, tax, total amounts, and non-food items.
-    Return a STRICT JSON array of objects with the following keys:
-    - item_name: string (clean name, e.g. "Tomatoes")
-    - quantity: string (e.g. "1kg", "2 packs", or "1" if unknown)
-    - category: string (one of: vegetable, fruit, dairy, meat, spice, grain, snack, beverage, other)
+    You are a kitchen assistant. Analyze this image (grocery bill, fridge photo, or ingredient shot).
+    Identify all food/grocery items found.
     
-    Example output:
-    [
-        {"item_name": "Milk", "quantity": "1L", "category": "dairy"},
-        {"item_name": "Onions", "quantity": "2kg", "category": "vegetable"}
-    ]
+    IMPORTANT: 
+    - Be lenient. If the image is blurry, give your BEST GUESS. 
+    - Do not fail. If you see *anything* consistent with food, list it.
+    - Ignore prices, tax, and non-food items.
+
+    Return a STRICT JSON object with this structure:
+    {
+        "items": [
+            {"item_name": "Milk", "quantity": "1L", "category": "dairy"},
+            {"item_name": "Unknown Veg", "quantity": "1", "category": "vegetable"}
+        ],
+        "confidence": 85  // Integer 0-100. How sure are you about these results?
+    }
+    
+    If the image is completely unreadable (black screen, floor, etc), return:
+    { "items": [], "confidence": 0 }
+
     RETURN ONLY JSON. NO MARKDOWN.
     """
 
@@ -57,11 +64,17 @@ def extract_items_from_image(image_bytes, mime_type="image/jpeg"):
         content = response.choices[0].message.content
         # Clean potential markdown code blocks
         content = content.replace("```json", "").replace("```", "").strip()
-        return json.loads(content)
+        data = json.loads(content)
+        
+        # Backward compatibility if AI returns just a list (rare but possible)
+        if isinstance(data, list):
+            return {"items": data, "confidence": 100}
+            
+        return data
         
     except Exception as e:
         print(f"Error in OpenAI Vision call: {e}")
-        return []
+        return {"items": [], "confidence": 0, "error": str(e)}
 
 def extract_meal_from_image(image_bytes, mime_type="image/jpeg"):
     """
