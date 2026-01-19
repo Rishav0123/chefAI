@@ -17,6 +17,8 @@ if "sqlite" in SQLALCHEMY_DATABASE_URL:
 else:
     # Disable client-side pooling for Supabase Transaction Mode
     pool_class = NullPool
+    # Increase timeout to handle Supabase cold starts (default is usually 10s)
+    connect_args = {"connect_timeout": 60}
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
