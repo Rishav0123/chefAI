@@ -206,10 +206,14 @@ const Dashboard = () => {
     );
 };
 
+import LandingPage from './components/LandingPage';
+
+
 // Main App Structure with Auth Logic
 const AppContent = () => {
     const { user, loading } = React.useContext(UserContext);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
 
     if (loading) {
         return (
@@ -231,7 +235,10 @@ const AppContent = () => {
     }
 
     if (!user) {
-        return <Login />;
+        if (showLogin) {
+            return <Login />;
+        }
+        return <LandingPage onGetStarted={() => setShowLogin(true)} />;
     }
 
     return (
