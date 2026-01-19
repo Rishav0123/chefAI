@@ -89,12 +89,20 @@ const UploadBill = ({ mode = 'bill' }) => {
                                 meal_type: data.meal_type || 'other'
                             });
                         } else {
-                            // Expecting list of items for stock
-                            setDetectedItems(data || []);
+                            // Expecting { items: [], confidence: ... }
+                            // Handle both new dict format and old list format (just in case)
+                            const items = Array.isArray(data) ? data : (data.items || []);
+
+                            setDetectedItems(items);
+
+                            if (items.length === 0) {
+                                setMessage("AI couldn't find any items. Try a clearer picture?");
+                            } else {
+                                setMessage("Please review the detected details.");
+                            }
                         }
 
                         setStatus('review');
-                        setMessage("Please review the detected details.");
                         setLoading(false);
                     } else if (status === 'error') {
                         clearInterval(pollInterval);
@@ -107,7 +115,9 @@ const UploadBill = ({ mode = 'bill' }) => {
                     clearInterval(pollInterval);
                     console.error("Polling Error:", err);
                     setStatus('error');
-                    setMessage("Failed to check status. Network issue?");
+                    // Show specific error from backend if available
+                    const specificError = err.response?.data?.detail || err.message;
+                    setMessage(specificError || "Failed to check status. Network issue?");
                     setLoading(false);
                 }
             }, 2000); // Check every 2 seconds
