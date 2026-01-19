@@ -66,7 +66,8 @@ const AddItem = () => {
             navigate('/');
         } catch (error) {
             console.error("Error adding item:", error);
-            alert("Failed to add item");
+            const msg = error.response?.data?.detail || error.message || "Unknown Error";
+            alert(`Failed: ${msg}`);
         } finally {
             setLoading(false);
         }
