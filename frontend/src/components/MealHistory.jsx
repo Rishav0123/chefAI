@@ -10,8 +10,8 @@ const MealHistory = () => {
     const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
-        if (user) fetchHistory();
-    }, [user, stockRefreshTrigger]);
+        if (user?.id) fetchHistory();
+    }, [user?.id, stockRefreshTrigger]);
 
     const fetchHistory = async () => {
         try {

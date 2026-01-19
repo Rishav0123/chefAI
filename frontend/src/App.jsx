@@ -22,7 +22,7 @@ const Dashboard = () => {
 
     // Fetch stock count for "Kitchen Capacity" metric
     useEffect(() => {
-        if (user) {
+        if (user?.id) {
             setFetching(true);
             api.get(`/stock/${user.id}`)
                 .then(res => {
@@ -34,7 +34,7 @@ const Dashboard = () => {
                     setFetching(false);
                 });
         }
-    }, [user, stockRefreshTrigger]);
+    }, [user?.id, stockRefreshTrigger]);
 
     // Calculate "Efficiency" (arbitrary metric based on stock count for UI flare)
     const efficiency = Math.min(Math.round((stockCount / 20) * 100), 100);

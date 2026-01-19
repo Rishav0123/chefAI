@@ -12,8 +12,8 @@ const StockList = () => {
     const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
-        if (user) fetchStock();
-    }, [user, stockRefreshTrigger]);
+        if (user?.id) fetchStock();
+    }, [user?.id, stockRefreshTrigger]);
 
     const fetchStock = async () => {
         try {
