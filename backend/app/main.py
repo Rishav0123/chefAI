@@ -57,6 +57,7 @@ app.add_middleware(
         "https://chef-ai-beryl.vercel.app",
         "https://chefai-m270.onrender.com",
         "http://localhost",
+        "https://localhost",
         "capacitor://localhost"
     ],
     allow_credentials=True,
