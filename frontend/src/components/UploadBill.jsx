@@ -61,29 +61,61 @@ const UploadBill = ({ mode = 'bill' }) => {
         const uploadType = isMealMode ? "meal" : "stock";
 
         setLoading(true);
+        setStatus(null);
+        setMessage("Uploading...");
+
         try {
+            // 1. Initiate Upload (Async)
             const res = await api.post(`/upload/?user_id=${user.id}&upload_type=${uploadType}`, formData);
+            const { job_id } = res.data;
 
-            if (isMealMode) {
-                // Expecting structured meal data
-                const data = res.data.data; // { name, ingredients, nutrition, meal_type }
-                setMealData({
-                    name: data.name || "Unknown Meal",
-                    ingredients: data.ingredients || [],
-                    nutrition: data.nutrition || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
-                    meal_type: data.meal_type || 'other'
-                });
-            } else {
-                // Expecting list of items for stock
-                setDetectedItems(res.data.data || []); // API returns { message, data: [...] } due to my change
-            }
+            setMessage("Analyzing image... (You can minimize this tab)");
 
-            setStatus('review');
-            setMessage("Please review the detected details.");
+            // 2. Poll for Status
+            const pollInterval = setInterval(async () => {
+                try {
+                    const statusRes = await api.get(`/upload/status/${job_id}`);
+                    const { status, data, error } = statusRes.data;
+
+                    if (status === 'completed') {
+                        clearInterval(pollInterval);
+
+                        if (isMealMode) {
+                            // Expecting structured meal data
+                            setMealData({
+                                name: data.name || "Unknown Meal",
+                                ingredients: data.ingredients || [],
+                                nutrition: data.nutrition || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
+                                meal_type: data.meal_type || 'other'
+                            });
+                        } else {
+                            // Expecting list of items for stock
+                            setDetectedItems(data || []);
+                        }
+
+                        setStatus('review');
+                        setMessage("Please review the detected details.");
+                        setLoading(false);
+                    } else if (status === 'error') {
+                        clearInterval(pollInterval);
+                        throw new Error(error || "AI Processing Failed");
+                    } else {
+                        // Still processing...
+                        console.log(`Job ${job_id}: ${status}`);
+                    }
+                } catch (err) {
+                    clearInterval(pollInterval);
+                    console.error("Polling Error:", err);
+                    setStatus('error');
+                    setMessage("Failed to check status. Network issue?");
+                    setLoading(false);
+                }
+            }, 2000); // Check every 2 seconds
+
         } catch (error) {
             console.error(error);
             setStatus('error');
-            let errorMessage = "Failed to process image.";
+            let errorMessage = "Failed to initiate upload.";
             if (error.response?.data?.detail) {
                 errorMessage = typeof error.response.data.detail === 'string'
                     ? error.response.data.detail
@@ -92,7 +124,6 @@ const UploadBill = ({ mode = 'bill' }) => {
                 errorMessage = error.message;
             }
             setMessage(errorMessage);
-        } finally {
             setLoading(false);
         }
     };
