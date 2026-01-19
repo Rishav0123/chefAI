@@ -5,6 +5,8 @@ import { UploadCloud, CheckCircle, AlertCircle, Camera, Utensils, Flame, Activit
 import LoadingOverlay from './LoadingOverlay';
 import { UserContext } from '../context/UserContext';
 
+import { compressImage } from '../utils/compressImage';
+
 const UploadBill = ({ mode = 'bill' }) => {
     const { user } = useContext(UserContext);
     const navigate = useNavigate();
@@ -55,18 +57,28 @@ const UploadBill = ({ mode = 'bill' }) => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const uploadType = isMealMode ? "meal" : "stock";
-
         setLoading(true);
         setStatus(null);
-        setMessage("Uploading...");
+        setMessage("Compressing image...");
 
         try {
+            // 0. Compress Image (Client-side)
+            const compressedFile = await compressImage(file);
+
+            const formData = new FormData();
+            formData.append("file", compressedFile);
+
+            const uploadType = isMealMode ? "meal" : "stock";
+
+            setMessage("Uploading... 0%");
+
             // 1. Initiate Upload (Async)
-            const res = await api.post(`/upload/?user_id=${user.id}&upload_type=${uploadType}`, formData);
+            const res = await api.post(`/upload/?user_id=${user.id}&upload_type=${uploadType}`, formData, {
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setMessage(`Uploading... ${percentCompleted}%`);
+                }
+            });
             const { job_id } = res.data;
 
             setMessage("Analyzing image... (You can minimize this tab)");
