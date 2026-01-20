@@ -180,7 +180,8 @@ const UploadBill = ({ mode = 'bill' }) => {
         } catch (error) {
             console.error('Batch add failed:', error);
             setStatus('error');
-            setMessage("Failed to save items. Please try again.");
+            const msg = error.response?.data?.detail || error.message || "Unknown Error";
+            setMessage(`Failed to save items: ${msg}`);
         } finally {
             setLoading(false);
         }
@@ -221,7 +222,8 @@ const UploadBill = ({ mode = 'bill' }) => {
         } catch (error) {
             console.error('Meal log failed:', error);
             setStatus('error');
-            setMessage("Failed to log meal. Please try again.");
+            const msg = error.response?.data?.detail || error.message || "Unknown Error";
+            setMessage(`Failed to log meal: ${msg}`);
         } finally {
             setLoading(false);
         }

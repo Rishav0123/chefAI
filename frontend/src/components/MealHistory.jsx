@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../context/UserContext';
-import { Utensils, Clock } from 'lucide-react';
-
+import { Utensils, Clock, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const MealHistory = (props) => {
@@ -99,9 +98,15 @@ const MealHistory = (props) => {
             {/* Header / Stats (Full Page) */}
             {!props.limit ? (
                 <div className="mb-10 animate-fade-in">
-                    <div className="mb-8">
-                        <h2 className="text-4xl font-black text-white mb-2">Meal History</h2>
-                        <p className="text-stone-400">Track your culinary journey and nutrition.</p>
+                    <div className="mb-8 flex justify-between items-end">
+                        <div>
+                            <h2 className="text-4xl font-black text-white mb-2">Meal History</h2>
+                            <p className="text-stone-400">Track your culinary journey and nutrition.</p>
+                        </div>
+                        <Link to="/add?mode=meal" className="btn-primary flex items-center gap-2">
+                            <Plus size={18} />
+                            Add New Meal
+                        </Link>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">

@@ -1,14 +1,18 @@
 import React, { useState, useContext, useEffect } from 'react';
 import api from '../api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Save, Utensils, Box, Flame, Activity, Wheat, Droplet } from 'lucide-react';
 import { UserContext } from '../context/UserContext';
 import LoadingOverlay from './LoadingOverlay';
 
 const AddItem = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user } = useContext(UserContext);
-    const [activeTab, setActiveTab] = useState('stock'); // 'stock' | 'meal'
+
+    // Initialize tab based on URL param ?mode=meal or default to 'stock'
+    const initialTab = new URLSearchParams(location.search).get('mode') || 'stock';
+    const [activeTab, setActiveTab] = useState(initialTab);
     const [loading, setLoading] = useState(false);
 
     // --- Stock Form State ---
