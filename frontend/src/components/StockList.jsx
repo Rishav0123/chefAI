@@ -90,66 +90,179 @@ const StockList = (props) => {
         )
     }
 
+    // Helper to render a single card (Used in both Widget and Full views)
+    const renderStockCard = (item) => (
+        <div key={item.stock_id} className="glass-panel p-6 relative group transition-all hover:scale-[1.02]">
+            {/* Category Indicator Dot */}
+            <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => handleEditClick(item)} className="p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-white transition-colors">
+                    <Edit2 size={16} />
+                </button>
+                <button onClick={() => handleDelete(item.stock_id)} className="p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-danger transition-colors">
+                    <Trash2 size={16} />
+                </button>
+            </div>
+
+            <div className="flex items-start justify-between mb-4">
+                <div className={`w-3 h-3 rounded-full mt-2 ${item.category === 'vegetable' ? 'bg-emerald-500' :
+                    item.category === 'fruit' ? 'bg-yellow-500' :
+                        item.category === 'meat' ? 'bg-red-500' :
+                            item.category === 'dairy' ? 'bg-blue-500' : 'bg-accent'
+                    }`}></div>
+            </div>
+
+            <h3 className="text-xl font-bold mb-2 text-white pr-10 truncate">{item.item_name}</h3>
+
+            <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-stone-500 font-bold uppercase tracking-wider text-xs">Quantity</span>
+                    <span className="text-white font-bold bg-white/5 px-3 py-1 rounded-lg border border-white/5">
+                        {item.quantity || 'N/A'}
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-stone-500 font-bold uppercase tracking-wider text-xs">Category</span>
+                    <span className="text-stone-400 capitalize">{item.category || 'Other'}</span>
+                </div>
+
+                {item.expiry_date && (
+                    <div className="flex items-center gap-2 text-xs font-medium text-danger bg-danger/10 px-3 py-2 rounded-lg mt-2">
+                        <Calendar size={12} />
+                        <span>Expires {item.expiry_date}</span>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
+    // --- Stats & Grouping Logic (Only for Full Page) ---
+    const stats = !props.limit ? {
+        total: stocks.length,
+        lowStock: stocks.filter(i => {
+            // Simple heuristic: if quantity contains "1" (like "1 kg" or "1 unit") it might be low, 
+            // but specific "low" logic depends on usage. For now, count items without specific quantity or "0".
+            return !i.quantity || i.quantity === '0' || parseInt(i.quantity) <= 1
+        }).length,
+        expiringSoon: stocks.filter(item => {
+            if (!item.expiry_date) return false;
+            const days = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+            return days <= 3;
+        }).length,
+        categoryCounts: stocks.reduce((acc, item) => {
+            acc[item.category] = (acc[item.category] || 0) + 1;
+            return acc;
+        }, {})
+    } : null;
+
+    // Group items by category for the full view
+    const groupedStocks = !props.limit ? stocks.reduce((acc, item) => {
+        const cat = item.category || 'Other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {}) : null;
+
+    // Capitalize helper
+    const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+
     return (
         <div>
-            {/* Header with Custom "Pantry Intelligence" look */}
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-accent">
-                        <Package size={20} />
+            {/* Header / Stats Section */}
+            {!props.limit ? (
+                <div className="mb-10 animate-fade-in">
+                    <div className="flex justify-between items-end mb-8">
+                        <div>
+                            <h2 className="text-4xl font-black text-white mb-2">Kitchen Inventory</h2>
+                            <p className="text-stone-400">Manage your stock, track expiry, and organize your pantry.</p>
+                        </div>
+                        <Link to="/add" className="btn-primary flex items-center gap-2">
+                            <Package size={20} /> Add New Item
+                        </Link>
                     </div>
-                    <h2 className="text-2xl font-black tracking-tight text-white">
-                        Pantry Intelligence
-                    </h2>
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div className="glass-panel p-6 flex items-center justify-between bg-gradient-to-br from-orange-500/10 to-transparent border-orange-500/20">
+                            <div>
+                                <p className="text-orange-200 text-sm font-bold uppercase tracking-wider mb-1">Total Items</p>
+                                <h3 className="text-4xl font-black text-orange-500">{stats.total}</h3>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                                <Tag size={24} />
+                            </div>
+                        </div>
+
+                        <div className="glass-panel p-6 flex items-center justify-between">
+                            <div>
+                                <p className="text-stone-400 text-sm font-bold uppercase tracking-wider mb-1">Expiring Soon</p>
+                                <h3 className={`text-4xl font-black ${stats.expiringSoon > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                    {stats.expiringSoon}
+                                </h3>
+                            </div>
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${stats.expiringSoon > 0 ? 'bg-red-500/20 text-red-500' : 'bg-emerald-500/20 text-emerald-500'}`}>
+                                <Calendar size={24} />
+                            </div>
+                        </div>
+
+                        <div className="glass-panel p-6 flex items-center justify-between">
+                            <div>
+                                <p className="text-stone-400 text-sm font-bold uppercase tracking-wider mb-1">Stock Health</p>
+                                <h3 className="text-4xl font-black text-blue-500">{stats.lowStock > 0 ? 'Action Needed' : 'Healthy'}</h3>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
+                                <Check size={24} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {(props.limit ? stocks.slice(0, props.limit) : stocks).map((item) => (
-                    <div key={item.stock_id} className="glass-panel p-6 relative group transition-all hover:scale-[1.02]">
-                        {/* Category Indicator Dot */}
-                        <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleEditClick(item)} className="p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-white transition-colors">
-                                <Edit2 size={16} />
-                            </button>
-                            <button onClick={() => handleDelete(item.stock_id)} className="p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-danger transition-colors">
-                                <Trash2 size={16} />
-                            </button>
+            ) : (
+                /* Widget Header */
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-accent">
+                            <Package size={20} />
                         </div>
-
-                        <div className="flex items-start justify-between mb-4">
-                            <div className={`w-3 h-3 rounded-full mt-2 ${item.category === 'vegetable' ? 'bg-emerald-500' :
-                                item.category === 'fruit' ? 'bg-yellow-500' :
-                                    item.category === 'meat' ? 'bg-red-500' :
-                                        item.category === 'dairy' ? 'bg-blue-500' : 'bg-accent'
-                                }`}></div>
-                        </div>
-
-                        <h3 className="text-xl font-bold mb-2 text-white pr-10 truncate">{item.item_name}</h3>
-
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-stone-500 font-bold uppercase tracking-wider text-xs">Quantity</span>
-                                <span className="text-white font-bold bg-white/5 px-3 py-1 rounded-lg border border-white/5">
-                                    {item.quantity || 'N/A'}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-stone-500 font-bold uppercase tracking-wider text-xs">Category</span>
-                                <span className="text-stone-400 capitalize">{item.category || 'Other'}</span>
-                            </div>
-
-                            {item.expiry_date && (
-                                <div className="flex items-center gap-2 text-xs font-medium text-danger bg-danger/10 px-3 py-2 rounded-lg mt-2">
-                                    <Calendar size={12} />
-                                    <span>Expires {item.expiry_date}</span>
-                                </div>
-                            )}
-                        </div>
+                        <h2 className="text-2xl font-black tracking-tight text-white">
+                            Pantry Intelligence
+                        </h2>
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
+
+            {/* Content: Either Grouped Sections (Full Page) or Flat Grid (Widget) */}
+            {!props.limit ? (
+                <div className="space-y-12">
+                    {Object.entries(groupedStocks).sort().map(([category, items]) => (
+                        <div key={category} className="animate-fade-in-up">
+                            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
+                                <span className={`w-4 h-4 rounded-full ${category === 'vegetable' ? 'bg-emerald-500' :
+                                    category === 'fruit' ? 'bg-yellow-500' :
+                                        category === 'meat' ? 'bg-red-500' :
+                                            category === 'grain' ? 'bg-amber-600' : 'bg-accent'
+                                    }`}></span>
+                                {capitalize(category)}
+                                <span className="text-sm font-normal text-stone-500 bg-white/5 px-2 py-1 rounded-full ml-2">{items.length}</span>
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {items.map(renderStockCard)}
+                            </div>
+                        </div>
+                    ))}
+
+                    {stocks.length === 0 && (
+                        <div className="text-center py-20 opacity-50">
+                            No items found. Add some!
+                        </div>
+                    )}
+                </div>
+            ) : (
+                /* Widget Flat Grid */
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {stocks.slice(0, props.limit).map(renderStockCard)}
+                </div>
+            )}
 
             {props.limit && stocks.length > props.limit && (
                 <div className="flex justify-center mt-8">

@@ -31,108 +31,122 @@ const MealHistory = (props) => {
     // logic to show only first N items if limit prop is present
     const displayedMeals = props.limit ? meals.slice(0, props.limit) : meals;
 
-    return (
-        <div style={{ marginTop: '2rem' }}>
-            {/* Header - No Button Here */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
-                    <Utensils size={24} color="var(--accent)" />
-                    Recent Meals
-                </h2>
+    // --- Stats & Grouping Logic ---
+    const stats = !props.limit ? {
+        totalMeals: meals.length,
+        totalCalories: meals.reduce((sum, m) => sum + (m.calories || 0), 0),
+        avgProtein: Math.round(meals.reduce((sum, m) => sum + (m.protein_g || 0), 0) / (meals.length || 1))
+    } : null;
+
+    const groupedMeals = !props.limit ? meals.reduce((acc, meal) => {
+        const dateStr = meal.created_at
+            ? new Date(meal.created_at).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
+            : 'Unknown Date';
+        if (!acc[dateStr]) acc[dateStr] = [];
+        acc[dateStr].push(meal);
+        return acc;
+    }, {}) : null;
+
+    // Helper: Render Card
+    const renderMealCard = (meal) => (
+        <div key={meal.id} className="glass-panel p-6 relative group hover:scale-[1.02] transition-transform">
+            <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-bold text-white truncate pr-4">{meal.name}</h3>
+                <div className="flex items-center gap-1 text-xs font-medium text-stone-400 bg-white/5 px-2 py-1 rounded-lg">
+                    <Clock size={12} />
+                    {meal.created_at ? new Date(meal.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                </div>
             </div>
 
-            {/* Grid of Meals */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {displayedMeals.map((meal) => (
-                    <div key={meal.id} className="glass-panel" style={{ padding: '1.5rem', position: 'relative' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
-                            <h3 style={{ fontSize: '1.2rem', margin: 0 }}>{meal.name}</h3>
-                            <div style={{
-                                background: 'rgba(255,255,255,0.1)',
-                                padding: '4px 8px',
-                                borderRadius: '12px',
-                                fontSize: '0.8rem',
-                                color: 'var(--text-secondary)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px'
-                            }}>
-                                <Clock size={12} />
-                                {/* Robust date parsing: handle ISO strings safely */}
-                                {meal.created_at ? new Date(meal.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Date N/A'}
-                            </div>
-                        </div>
+            {/* Nutrition Badges */}
+            <div className="flex gap-2 mb-4">
+                {meal.calories && (
+                    <span className="text-sm font-bold text-orange-400">🔥 {meal.calories} kcal</span>
+                )}
+                {meal.protein_g && (
+                    <span className="text-sm font-bold text-blue-400">💪 {meal.protein_g}g prot</span>
+                )}
+            </div>
 
-                        {/* Nutrition Badges */}
-                        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                            {meal.calories && (
-                                <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>
-                                    🔥 {meal.calories} kcal
-                                </div>
-                            )}
-                            {meal.protein_g && (
-                                <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#3b82f6' }}>
-                                    💪 {meal.protein_g}g protein
-                                </div>
-                            )}
-                            {meal.protein_g > 20 && (
-                                <span style={{
-                                    fontSize: '0.7rem', background: '#3b82f6', color: 'white',
-                                    padding: '2px 6px', borderRadius: '4px', alignSelf: 'center'
-                                }}>
-                                    High Protein
-                                </span>
-                            )}
-                        </div>
-
-                        {meal.ingredients_used && meal.ingredients_used.length > 0 && (
-                            <div style={{ marginTop: '5px' }}>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '5px' }}>Ingredients Used:</div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                    {meal.ingredients_used.map((ing, idx) => (
-                                        <span key={idx} style={{
-                                            fontSize: '0.8rem',
-                                            background: 'rgba(16, 185, 129, 0.2)',
-                                            color: '#6ee7b7',
-                                            padding: '2px 8px',
-                                            borderRadius: '4px'
-                                        }}>
-                                            {ing.item}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
+            {/* Ingredients */}
+            {meal.ingredients_used && meal.ingredients_used.length > 0 && (
+                <div className="mt-2">
+                    <p className="text-xs text-stone-500 mb-2 uppercase tracking-wider font-bold">Ingredients</p>
+                    <div className="flex flex-wrap gap-2">
+                        {meal.ingredients_used.slice(0, 4).map((ing, idx) => (
+                            <span key={idx} className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/10">
+                                {ing.item}
+                            </span>
+                        ))}
+                        {meal.ingredients_used.length > 4 && (
+                            <span className="text-xs text-stone-500 px-1">+{meal.ingredients_used.length - 4} more</span>
                         )}
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
+        </div>
+    );
 
-            {/* Footer - View All Button Here */}
+    return (
+        <div className="mt-8">
+            {/* Header / Stats (Full Page) */}
+            {!props.limit ? (
+                <div className="mb-10 animate-fade-in">
+                    <div className="mb-8">
+                        <h2 className="text-4xl font-black text-white mb-2">Meal History</h2>
+                        <p className="text-stone-400">Track your culinary journey and nutrition.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div className="glass-panel p-6 flex flex-col justify-between border-blue-500/20 bg-blue-500/5">
+                            <span className="text-blue-200 text-xs font-bold uppercase">Average Protein</span>
+                            <span className="text-4xl font-black text-blue-500 mt-2">{stats.avgProtein}g</span>
+                        </div>
+                        <div className="glass-panel p-6 flex flex-col justify-between border-orange-500/20 bg-orange-500/5">
+                            <span className="text-orange-200 text-xs font-bold uppercase">Total Calories</span>
+                            <span className="text-4xl font-black text-orange-500 mt-2">{stats.totalCalories}</span>
+                        </div>
+                        <div className="glass-panel p-6 flex flex-col justify-between">
+                            <span className="text-stone-400 text-xs font-bold uppercase">Meals Logged</span>
+                            <span className="text-4xl font-black text-white mt-2">{stats.totalMeals}</span>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                /* Widget Header */
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+                        <Utensils size={24} className="text-accent" />
+                        Recent Meals
+                    </h2>
+                </div>
+            )}
+
+            {/* Content Groups */}
+            {!props.limit ? (
+                <div className="space-y-12">
+                    {Object.entries(groupedMeals).map(([date, meals]) => (
+                        <div key={date} className="animate-fade-in-up">
+                            <h3 className="text-lg font-bold text-stone-300 mb-6 border-b border-white/5 pb-2 sticky top-0 bg-stone-950/80 backdrop-blur-md z-10 py-4">
+                                {date}
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {meals.map(renderMealCard)}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {displayedMeals.map(renderMealCard)}
+                </div>
+            )}
+
             {props.limit && meals.length > props.limit && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                <div className="flex justify-center mt-8">
                     <Link
                         to="/meals"
-                        style={{
-                            background: 'transparent',
-                            border: '1px solid var(--accent)',
-                            color: 'var(--accent)',
-                            padding: '8px 16px',
-                            borderRadius: '20px',
-                            cursor: 'pointer',
-                            fontSize: '0.9rem',
-                            fontWeight: '500',
-                            textDecoration: 'none',
-                            display: 'inline-block',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.background = 'var(--accent)';
-                            e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={e => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = 'var(--accent)';
-                        }}
+                        className="btn-glass text-sm"
                     >
                         View All ({meals.length})
                     </Link>
