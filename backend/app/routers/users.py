@@ -22,9 +22,28 @@ class UserProfileUpdate(BaseModel):
 @router.get("/{user_id}")
 def get_user_profile(user_id: str, db: Session = Depends(get_db)):
     user = db.query(kitchen.User).filter(kitchen.User.user_id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
     
+    # Auto-create user if they don't exist (First time login via Supabase)
+    if not user:
+        try:
+            # Create core user
+            user = kitchen.User(user_id=user_id, name="Chef", email="user@example.com") # Email placeholder, updated on actual profile save if needed
+            db.add(user)
+            db.commit()
+            
+            # Create empty profile
+            profile = kitchen.UserProfile(user_id=user_id)
+            db.add(profile)
+            db.commit()
+            db.refresh(user)
+        except Exception as e:
+            # Rollback in case of race condition or error
+            db.rollback()
+            # Try fetching again in case another request created it
+            user = db.query(kitchen.User).filter(kitchen.User.user_id == user_id).first()
+            if not user:
+                raise HTTPException(status_code=500, detail=f"Failed to create user profile: {str(e)}")
+
     # Merge basic user info with profile info
     profile_data = {
         "user_id": user.user_id,
