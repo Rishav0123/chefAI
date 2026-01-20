@@ -96,7 +96,7 @@ const Dashboard = () => {
                         <Camera size={24} />
                     </div>
                     <h3 className="text-xl font-bold mb-1">Visual Scan</h3>
-                    <p className="text-stone-500 text-sm">Capture bills or items</p>
+                    <p className="text-stone-500 text-sm">Capture bills, items, or meals</p>
                 </Link>
 
                 {/* 2. Manual Entry */}
