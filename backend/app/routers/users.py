@@ -27,7 +27,7 @@ def get_user_profile(user_id: str, db: Session = Depends(get_db)):
     if not user:
         try:
             # Create core user
-            user = kitchen.User(user_id=user_id, name="Chef", email="user@example.com") # Email placeholder, updated on actual profile save if needed
+            user = kitchen.User(user_id=user_id, name="Chef")
             db.add(user)
             db.commit()
             
