@@ -189,12 +189,12 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left: Inventory */}
                 <div className="lg:col-span-2 space-y-8">
-                    <StockList />
+                    <StockList limit={5} />
                 </div>
 
                 {/* Right: History & Chat Teaser */}
                 <div className="space-y-8">
-                    <MealHistory />
+                    <MealHistory limit={5} />
                 </div>
             </div>
         </div>
@@ -268,6 +268,8 @@ const AppContent = () => {
                         <Route path="/scan/item" element={<UploadBill mode="single" />} />
                         <Route path="/scan/meal" element={<UploadBill mode="meal" />} />
                         <Route path="/chat" element={<ChatAssistant />} />
+                        <Route path="/inventory" element={<div className="animate-fade-in"><StockList /></div>} />
+                        <Route path="/meals" element={<div className="animate-fade-in"><MealHistory /></div>} />
                     </Routes>
                 </main>
 

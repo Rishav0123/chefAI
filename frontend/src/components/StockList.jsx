@@ -4,12 +4,11 @@ import { UserContext } from '../context/UserContext';
 import { Link } from 'react-router-dom';
 import { Package, Calendar, Tag, Trash2, Edit2, X, Check, UploadCloud, Camera } from 'lucide-react';
 
-const StockList = () => {
+const StockList = (props) => {
     const { user, stockRefreshTrigger } = useContext(UserContext);
     const [stocks, setStocks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingItem, setEditingItem] = useState(null);
-    const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
         if (user?.id) fetchStock();
@@ -106,7 +105,7 @@ const StockList = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {(showAll ? stocks : stocks.slice(0, 5)).map((item) => (
+                {(props.limit ? stocks.slice(0, props.limit) : stocks).map((item) => (
                     <div key={item.stock_id} className="glass-panel p-6 relative group transition-all hover:scale-[1.02]">
                         {/* Category Indicator Dot */}
                         <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -152,14 +151,14 @@ const StockList = () => {
                 ))}
             </div>
 
-            {stocks.length > 5 && (
+            {props.limit && stocks.length > props.limit && (
                 <div className="flex justify-center mt-8">
-                    <button
-                        onClick={() => setShowAll(!showAll)}
+                    <Link
+                        to="/inventory"
                         className="btn-glass text-sm"
                     >
-                        {showAll ? 'Show Less' : `View All Inventory (${stocks.length})`}
-                    </button>
+                        View All Inventory ({stocks.length})
+                    </Link>
                 </div>
             )}
 

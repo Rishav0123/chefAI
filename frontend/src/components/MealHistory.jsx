@@ -3,11 +3,12 @@ import api from '../api';
 import { UserContext } from '../context/UserContext';
 import { Utensils, Clock } from 'lucide-react';
 
-const MealHistory = () => {
+import { Link } from 'react-router-dom';
+
+const MealHistory = (props) => {
     const { user, stockRefreshTrigger } = useContext(UserContext); // Refetch when stock refreshes (implies meal logged)
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
         if (user?.id) fetchHistory();
@@ -27,8 +28,8 @@ const MealHistory = () => {
     if (loading) return <div></div>; // Silent loading
     if (meals.length === 0) return null; // Hide if empty
 
-    // logic to show only first 5 items
-    const displayedMeals = showAll ? meals : meals.slice(0, 5);
+    // logic to show only first N items if limit prop is present
+    const displayedMeals = props.limit ? meals.slice(0, props.limit) : meals;
 
     return (
         <div style={{ marginTop: '2rem' }}>
@@ -107,10 +108,10 @@ const MealHistory = () => {
             </div>
 
             {/* Footer - View All Button Here */}
-            {meals.length > 5 && (
+            {props.limit && meals.length > props.limit && (
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                    <button
-                        onClick={() => setShowAll(!showAll)}
+                    <Link
+                        to="/meals"
                         style={{
                             background: 'transparent',
                             border: '1px solid var(--accent)',
@@ -120,6 +121,8 @@ const MealHistory = () => {
                             cursor: 'pointer',
                             fontSize: '0.9rem',
                             fontWeight: '500',
+                            textDecoration: 'none',
+                            display: 'inline-block',
                             transition: 'all 0.2s'
                         }}
                         onMouseEnter={e => {
@@ -131,8 +134,8 @@ const MealHistory = () => {
                             e.currentTarget.style.color = 'var(--accent)';
                         }}
                     >
-                        {showAll ? 'Show Less' : `View All (${meals.length})`}
-                    </button>
+                        View All ({meals.length})
+                    </Link>
                 </div>
             )}
         </div>
