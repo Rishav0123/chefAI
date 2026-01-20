@@ -58,6 +58,22 @@ const Login = () => {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `https://${window.location.hostname === 'localhost' ? 'localhost:5173' : window.location.hostname}/`
+                }
+            });
+            if (error) throw error;
+        } catch (error) {
+            setErrorMsg(error.message);
+            setLoading(false);
+        }
+    };
+
     return (
         <div style={{ maxWidth: '400px', margin: '50px auto' }}>
             <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
@@ -82,6 +98,38 @@ const Login = () => {
                         )}
                     </div>
                 )}
+
+                <button
+                    onClick={handleGoogleLogin}
+                    disabled={loading}
+                    style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        background: 'white',
+                        color: '#333',
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        cursor: 'pointer',
+                        marginBottom: '20px',
+                        transition: 'transform 0.2s'
+                    }}
+                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'}
+                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="G" style={{ width: '20px', height: '20px' }} />
+                    Continue with Google
+                </button>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                    <div style={{ h: '1px', flex: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                    <span>OR</span>
+                    <div style={{ h: '1px', flex: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                </div>
 
                 <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div style={{ position: 'relative' }}>
