@@ -129,8 +129,8 @@ const Dashboard = () => {
                 </div>
             </section>
 
-            {/* Interaction Grid (Inputs) */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Interaction Grid (Inputs & Shopping) */}
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* 1. Visual Scan */}
                 <Link to="/scan" className="glass-panel p-8 flex flex-col items-start justify-center hover:border-accent/50 transition-all group relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-all group-hover:bg-accent/10"></div>
@@ -149,12 +149,21 @@ const Dashboard = () => {
                     <h3 className="text-xl font-bold mb-1">Manual Entry</h3>
                     <p className="text-stone-500 text-sm">Log items or meals</p>
                 </Link>
+
+                {/* 3. Shopping List */}
+                <div className="glass-panel p-8 flex flex-col items-start justify-center hover:bg-white/5 transition-colors cursor-pointer group">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-white transition-all text-stone-400">
+                        <ShoppingBag size={24} />
+                    </div>
+                    <h3 className="text-xl font-bold mb-1 text-white">Shopping List</h3>
+                    <p className="text-stone-500 text-sm">Automated by AI</p>
+                </div>
             </section>
 
-            {/* Status & Planning Grid */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Kitchen Capacity Widget (Wide) */}
-                <div className="md:col-span-2 glass-panel p-8 flex flex-col justify-between relative overflow-hidden group">
+            {/* Status & Nutrition Grid */}
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Kitchen Capacity Widget */}
+                <div className="glass-panel p-8 flex flex-col justify-between relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-accent/5 rounded-full blur-[60px] -mr-16 -mt-16 transition-all group-hover:bg-accent/10"></div>
                     <div className="flex justify-between items-end mb-6">
                         <div>
