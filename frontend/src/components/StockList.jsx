@@ -12,6 +12,13 @@ const StockList = (props) => {
 
     useEffect(() => {
         if (user?.id) fetchStock();
+
+        const onFocus = () => {
+            if (user?.id) fetchStock();
+        };
+
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
     }, [user?.id, stockRefreshTrigger]);
 
     const fetchStock = async () => {

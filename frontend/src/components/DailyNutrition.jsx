@@ -17,6 +17,13 @@ const DailyNutrition = () => {
 
     useEffect(() => {
         if (user?.id) calculateDailyStats();
+
+        const onFocus = () => {
+            if (user?.id) calculateDailyStats();
+        };
+
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
     }, [user?.id, stockRefreshTrigger]);
 
     const calculateDailyStats = async () => {

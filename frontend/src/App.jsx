@@ -22,19 +22,28 @@ const Dashboard = () => {
     const [fetching, setFetching] = useState(true);
 
     // Fetch stock for metrics
+    // Fetch stock for metrics
     useEffect(() => {
-        if (user?.id) {
-            setFetching(true);
-            api.get(`/stock/${user.id}`)
-                .then(res => {
-                    setStockItems(res.data);
-                    setFetching(false);
-                })
-                .catch(err => {
-                    console.error(err);
-                    setFetching(false);
-                });
-        }
+        const fetchData = () => {
+            if (user?.id) {
+                setFetching(true);
+                api.get(`/stock/${user.id}`)
+                    .then(res => {
+                        setStockItems(res.data);
+                        setFetching(false);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        setFetching(false);
+                    });
+            }
+        };
+
+        fetchData();
+
+        const onFocus = () => fetchData();
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
     }, [user?.id, stockRefreshTrigger]);
 
     // 1. Capacity: Simple count metric (Target: 20 items = 100%)

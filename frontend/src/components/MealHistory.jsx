@@ -12,6 +12,13 @@ const MealHistory = (props) => {
 
     useEffect(() => {
         if (user?.id) fetchHistory();
+
+        const onFocus = () => {
+            if (user?.id) fetchHistory();
+        };
+
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
     }, [user?.id, stockRefreshTrigger]);
 
     const fetchHistory = async () => {
