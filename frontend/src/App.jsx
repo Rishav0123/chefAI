@@ -17,17 +17,16 @@ import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
 
 const Dashboard = () => {
-    const { user, stockRefreshTrigger } = React.useContext(UserContext);
-    const [stockCount, setStockCount] = useState(0);
+    const [stockItems, setStockItems] = useState([]);
     const [fetching, setFetching] = useState(true);
 
-    // Fetch stock count for "Kitchen Capacity" metric
+    // Fetch stock for metrics
     useEffect(() => {
         if (user?.id) {
             setFetching(true);
             api.get(`/stock/${user.id}`)
                 .then(res => {
-                    setStockCount(res.data.length);
+                    setStockItems(res.data);
                     setFetching(false);
                 })
                 .catch(err => {
@@ -37,8 +36,19 @@ const Dashboard = () => {
         }
     }, [user?.id, stockRefreshTrigger]);
 
-    // Calculate "Efficiency" (arbitrary metric based on stock count for UI flare)
-    const efficiency = Math.min(Math.round((stockCount / 20) * 100), 100);
+    // 1. Capacity: Simple count metric (Target: 20 items = 100%)
+    const efficiency = Math.min(Math.round((stockItems.length / 20) * 100), 100);
+
+    // 2. Freshness: % of items NOT expiring in the next 3 days
+    const freshness = stockItems.length > 0 ? Math.round((stockItems.filter(item => {
+        if (!item.expiry_date) return true;
+        const daysUntilExpiry = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+        return daysUntilExpiry > 3;
+    }).length / stockItems.length) * 100) : 100;
+
+    // 3. Variety: How many unique categories exist out of 5 core ones
+    const uniqueCategories = new Set(stockItems.map(i => i.category)).size;
+    const varietyScore = Math.min(Math.round((uniqueCategories / 5) * 100), 100);
 
     return (
         <div className="animate-fade-in space-y-12">
@@ -121,29 +131,51 @@ const Dashboard = () => {
             {/* Status & Nutrition Grid */}
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Kitchen Capacity Widget */}
-                <div className="glass-panel p-8 flex flex-col justify-between relative overflow-hidden group">
+                {/* Kitchen Capacity & Metrics Widget */}
+                <div className="glass-panel p-6 flex flex-col justify-between relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-accent/5 rounded-full blur-[60px] -mr-16 -mt-16 transition-all group-hover:bg-accent/10"></div>
-                    <div className="flex justify-between items-end mb-6">
-                        <div>
-                            <h3 className="text-stone-400 text-sm font-bold uppercase tracking-widest mb-2">Pantry Status</h3>
-                            {fetching ? (
-                                <div className="text-3xl font-bold text-stone-500 mb-1 animate-pulse">Syncing...</div>
-                            ) : (
-                                <div className="text-5xl font-black text-accent mb-1">{efficiency}<span className="text-2xl text-white ml-1">% Capacity</span></div>
-                            )}
-                            <p className="text-stone-500 text-sm font-medium">Auto-calculated based on {stockCount} items.</p>
-                        </div>
-                        <div className="hidden md:block">
-                            <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center">
-                                <Activity size={20} className="text-stone-400" />
-                            </div>
+
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-stone-400 text-sm font-bold uppercase tracking-widest">Pantry Status</h3>
+                        <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
+                            <Activity size={16} className="text-stone-400" />
                         </div>
                     </div>
-                    <div>
-                        <div className="h-3 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-accent rounded-full transition-all duration-1000 relative" style={{ width: `${efficiency}%` }}>
-                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+
+                    <div className="grid grid-cols-1 gap-6">
+                        {/* 1. Capacity */}
+                        <div>
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="font-bold text-white">Capacity</span>
+                                <span className="text-accent font-black">{efficiency}%</span>
                             </div>
+                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-accent rounded-full" style={{ width: `${efficiency}%` }}></div>
+                            </div>
+                        </div>
+
+                        {/* 2. Freshness */}
+                        <div>
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="font-bold text-white">Freshness</span>
+                                <span className="text-green-500 font-black">{freshness}%</span>
+                            </div>
+                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-green-500 rounded-full" style={{ width: `${freshness}%` }}></div>
+                            </div>
+                            <p className="text-xs text-stone-500 mt-1">Items safe from expiry</p>
+                        </div>
+
+                        {/* 3. Variety */}
+                        <div>
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="font-bold text-white">Variety</span>
+                                <span className="text-blue-500 font-black">{varietyScore}%</span>
+                            </div>
+                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${varietyScore}%` }}></div>
+                            </div>
+                            <p className="text-xs text-stone-500 mt-1">Diversity of ingredients</p>
                         </div>
                     </div>
                 </div>
