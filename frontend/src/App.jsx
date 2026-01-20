@@ -17,6 +17,7 @@ import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
 
 const Dashboard = () => {
+    const { user, stockRefreshTrigger } = React.useContext(UserContext);
     const [stockItems, setStockItems] = useState([]);
     const [fetching, setFetching] = useState(true);
 
