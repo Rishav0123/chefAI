@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import './index.css';
 import StockList from './components/StockList';
 import AddItem from './components/AddItem';
+import DailyNutrition from './components/DailyNutrition';
 import UploadBill from './components/UploadBill';
 import ChatAssistant from './components/ChatAssistant';
 import Login from './components/Login';
@@ -180,14 +181,8 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Shopping List (Placeholder) */}
-                <div className="glass-panel p-8 flex flex-col items-start justify-center opacity-60 hover:opacity-80 transition-opacity cursor-not-allowed">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                        <ShoppingBag size={24} />
-                    </div>
-                    <h3 className="text-xl font-bold mb-1">Shopping List</h3>
-                    <p className="text-stone-500 text-sm">Automated by AI (Coming soon)</p>
-                </div>
+                {/* Daily Nutrition Tracker */}
+                <DailyNutrition />
             </section>
 
             {/* Main Content Area */}
