@@ -85,49 +85,7 @@ const Dashboard = () => {
                 </div>
             </section>
 
-            {/* How It Works - Onboarding Guide */}
-            <section className="animate-fade-in-up">
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="h-px bg-white/10 flex-1"></div>
-                    <span className="text-stone-500 font-bold uppercase tracking-widest text-xs">How It Works</span>
-                    <div className="h-px bg-white/10 flex-1"></div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Step 1 */}
-                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group">
-                        <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-accent font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">1</div>
-                        <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Scan & Add</h3>
-                            <p className="text-stone-400 text-sm leading-relaxed">
-                                Upload a bill or photo of your kitchen. AI detects ingredients instantly.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Step 2 */}
-                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group">
-                        <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-accent font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">2</div>
-                        <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Ask Chef AI</h3>
-                            <p className="text-stone-400 text-sm leading-relaxed">
-                                "What can I cook?" The AI suggests personalized recipes based on your stock.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Step 3 */}
-                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group">
-                        <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-accent font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">3</div>
-                        <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Cook & Track</h3>
-                            <p className="text-stone-400 text-sm leading-relaxed">
-                                Follow real-time recipes and auto-deduct used ingredients from your pantry.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Interaction Grid (Inputs & Shopping) */}
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">

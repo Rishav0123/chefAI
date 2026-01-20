@@ -56,6 +56,50 @@ const LandingPage = ({ onGetStarted }) => {
                 </div>
             </header>
 
+            {/* How It Works - Onboarding Steps */}
+            <section className="relative z-10 container mx-auto px-6 py-12">
+                <div className="flex items-center gap-4 mb-12 justify-center">
+                    <div className="h-px bg-white/10 w-24"></div>
+                    <span className="text-stone-500 font-bold uppercase tracking-widest text-xs">How It Works</span>
+                    <div className="h-px bg-white/10 w-24"></div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Step 1 */}
+                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
+                        <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">1</div>
+                        <div>
+                            <h3 className="text-white font-bold text-lg mb-1">Scan & Add</h3>
+                            <p className="text-stone-400 text-sm leading-relaxed">
+                                Upload a bill or photo of your kitchen. AI detects ingredients instantly.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
+                        <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">2</div>
+                        <div>
+                            <h3 className="text-white font-bold text-lg mb-1">Ask Chef AI</h3>
+                            <p className="text-stone-400 text-sm leading-relaxed">
+                                "What can I cook?" The AI suggests personalized recipes based on your stock.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Step 3 */}
+                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
+                        <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">3</div>
+                        <div>
+                            <h3 className="text-white font-bold text-lg mb-1">Cook & Track</h3>
+                            <p className="text-stone-400 text-sm leading-relaxed">
+                                Follow real-time recipes and auto-deduct used ingredients from your pantry.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Features Section */}
             <section className="relative z-10 container mx-auto px-6 py-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
