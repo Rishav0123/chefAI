@@ -23,6 +23,60 @@ class MealLogRequest(BaseModel):
     carbs_g: int = None
     fat_g: int = None
 
+# --- AI Estimator ---
+import os
+import json
+from openai import OpenAI
+client = OpenAI()
+
+class EstimationRequest(BaseModel):
+    meal_name: str
+
+@router.post("/estimate")
+def estimate_meal_data(request: EstimationRequest):
+    """
+    Uses LLM to estimate ingredients and nutrition for a given meal name.
+    """
+    try:
+        prompt = f"""
+        You are a nutrition assistant. The user is cooking "{request.meal_name}".
+        
+        Please estimate:
+        1. A list of 3-6 likely raw ingredients used (item name and approximate quantity for 1 serving).
+        2. Nutritional values (calories, protein_g, carbs_g, fat_g).
+
+        Return ONLY valid JSON in this format:
+        {{
+            "ingredients": [
+                {{"item": "Ingredient Name", "qty": "Quantity (e.g. 100g)"}}
+            ],
+            "nutrition": {{
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0
+            }}
+        }}
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"}
+        )
+        
+        content = response.choices[0].message.content
+        data = json.loads(content)
+        
+        return data
+
+    except Exception as e:
+        print(f"Estimation Error: {e}")
+        return {
+            "ingredients": [],
+            "nutrition": {"calories": 0, "protein": 0, "carbs": 0, "fat": 0}
+        }
+
 @router.post("/")
 def log_meal(request: MealLogRequest, db: Session = Depends(get_db)):
     """

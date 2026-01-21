@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import api from '../api';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Save, Utensils, Box, Flame, Activity, Wheat, Droplet } from 'lucide-react';
+import { Save, Utensils, Box, Flame, Activity, Wheat, Droplet, X, Sparkles } from 'lucide-react';
 import { UserContext } from '../context/UserContext';
 import LoadingOverlay from './LoadingOverlay';
 
@@ -158,6 +158,66 @@ const AddItem = () => {
             name: '', meal_type: 'other', meal_source: 'home',
             calories: '', protein_g: '', carbs_g: '', fat_g: '', ingredients_used: []
         });
+    };
+
+    // --- Ingredient Sub-form Handlers ---
+    const [ingredientInput, setIngredientInput] = useState({ item: '', qty: '' });
+
+    const handleAddIngredient = () => {
+        if (!ingredientInput.item || !ingredientInput.qty) return;
+        setMealFormData(prev => ({
+            ...prev,
+            ingredients_used: [...prev.ingredients_used, { item: ingredientInput.item, qty: ingredientInput.qty }]
+        }));
+        setIngredientInput({ item: '', qty: '' });
+    };
+
+    const handleRemoveIngredient = (index) => {
+        setMealFormData(prev => ({
+            ...prev,
+            ingredients_used: prev.ingredients_used.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleEstimate = async (target) => {
+        if (!mealFormData.name) {
+            alert("Please enter a Meal Name first!");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await api.post('/meals/estimate', { meal_name: mealFormData.name });
+            const data = res.data;
+
+            setMealFormData(prev => {
+                const updates = { ...prev };
+
+                if (target === 'ingredients' || target === 'all') {
+                    // Append estimated ingredients
+                    if (data.ingredients && data.ingredients.length > 0) {
+                        updates.ingredients_used = [...prev.ingredients_used, ...data.ingredients];
+                    }
+                }
+
+                if (target === 'nutrition' || target === 'all') {
+                    if (data.nutrition) {
+                        updates.calories = data.nutrition.calories;
+                        updates.protein_g = data.nutrition.protein;
+                        updates.carbs_g = data.nutrition.carbs;
+                        updates.fat_g = data.nutrition.fat;
+                    }
+                }
+
+                return updates;
+            });
+
+        } catch (error) {
+            console.error("Estimation failed:", error);
+            alert("Could not estimate data. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleMealSubmit = async (e) => {
@@ -359,10 +419,74 @@ const AddItem = () => {
                             </div>
                         </div>
 
+                        {/* Ingredients Section (Only for Home Cooked) */}
+                        {mealFormData.meal_source === 'home' && (
+                            <div className="bg-stone-800/30 p-4 rounded-xl space-y-3 border border-white/5">
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 flex items-center gap-2">
+                                    <Box size={16} /> Ingredients Used
+                                </h3>
+
+                                {/* List of Added Ingredients */}
+                                {mealFormData.ingredients_used.length > 0 && (
+                                    <ul className="mb-3 space-y-2">
+                                        {mealFormData.ingredients_used.map((ing, idx) => (
+                                            <li key={idx} className="flex justify-between items-center bg-stone-900 px-3 py-2 rounded-lg text-sm">
+                                                <span className="text-stone-300">{ing.item} <span className="text-stone-500">({ing.qty})</span></span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveIngredient(idx)}
+                                                    className="text-stone-500 hover:text-red-400"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                {/* Add Ingredient Inputs */}
+                                <div className="flex gap-2">
+                                    <input
+                                        placeholder="Item (e.g. Rice)"
+                                        className="input-field flex-[2] min-w-0"
+                                        list="stock-options-meal"
+                                        value={ingredientInput.item}
+                                        onChange={e => setIngredientInput({ ...ingredientInput, item: e.target.value })}
+                                    />
+                                    <datalist id="stock-options-meal">
+                                        {existingStockNames.map((name, i) => <option key={i} value={name} />)}
+                                    </datalist>
+
+                                    <input
+                                        placeholder="Qty"
+                                        className="input-field flex-1 min-w-0"
+                                        value={ingredientInput.qty}
+                                        onChange={e => setIngredientInput({ ...ingredientInput, qty: e.target.value })}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAddIngredient}
+                                        className="bg-stone-700 hover:bg-stone-600 text-white p-3 rounded-xl transition-all"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="bg-white/5 p-4 rounded-xl space-y-4">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 flex items-center gap-2">
-                                <Activity size={16} /> Nutrition (Optional)
-                            </h3>
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 flex items-center gap-2">
+                                    <Activity size={16} /> Nutrition (Optional)
+                                </h3>
+                                <button
+                                    type="button"
+                                    onClick={() => handleEstimate('nutrition')}
+                                    className="text-xs flex items-center gap-1 text-accent hover:text-orange-400 bg-stone-900 px-2 py-1 rounded-lg border border-orange-500/20 transition-all"
+                                >
+                                    <Sparkles size={12} /> Auto-Calculate
+                                </button>
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-xs text-stone-400 mb-1 flex items-center gap-1"><Flame size={12} /> Calories</label>
@@ -383,20 +507,46 @@ const AddItem = () => {
                             </div>
                         </div>
 
-                        {/* Queue Summary */}
-                        {mealQueue.length > 0 && (
-                            <div className="bg-stone-800/50 p-4 rounded-xl border border-white/10 mb-4">
-                                <h4 className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">Ready to Log ({mealQueue.length})</h4>
-                                <ul className="space-y-1">
-                                    {mealQueue.map((m, i) => (
-                                        <li key={i} className="text-white text-sm flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                                            {m.name} <span className="text-stone-500">({m.meal_type})</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                        {/* Queue Display: Render as Cards */}
+                        <div className="space-y-4 mb-6">
+                            {mealQueue.map((m, i) => (
+                                <div key={i} className="p-5 rounded-2xl bg-stone-800 border border-orange-500/30 shadow-lg relative animate-fade-in group">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h4 className="text-white font-bold text-lg">{m.name}</h4>
+                                            <div className="flex gap-2 mt-1">
+                                                <span className="text-xs font-bold uppercase tracking-wider text-stone-500 bg-stone-900 px-2 py-1 rounded-md">{m.meal_type}</span>
+                                                <span className="text-xs font-bold uppercase tracking-wider text-stone-500 bg-stone-900 px-2 py-1 rounded-md">{m.meal_source}</span>
+                                            </div>
+                                        </div>
+                                        <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center font-bold text-sm">
+                                            {i + 1}
+                                        </div>
+                                    </div>
+
+                                    {/* Macros Mini-Summary */}
+                                    {(m.calories || m.protein_g) && (
+                                        <div className="flex gap-4 text-xs text-stone-400 mt-3 pt-3 border-t border-white/5">
+                                            {m.calories && <span className="flex items-center gap-1"><Flame size={10} /> {m.calories} kcal</span>}
+                                            {m.protein_g && <span className="flex items-center gap-1"><Utensils size={10} /> {m.protein_g}g pro</span>}
+                                        </div>
+                                    )}
+
+                                    {/* Delete Button (Visual Only for now, logic needed) */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newQueue = [...mealQueue];
+                                            newQueue.splice(i, 1);
+                                            setMealQueue(newQueue);
+                                        }}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:scale-110"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
 
                         <div className="flex flex-col gap-3">
                             <button
