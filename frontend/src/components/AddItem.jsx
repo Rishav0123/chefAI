@@ -298,15 +298,15 @@ const AddItem = () => {
                             </div>
                         )}
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3">
                             <button
                                 onClick={handleAddAnotherStock}
                                 type="button"
-                                className="flex-1 bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-4 rounded-xl font-bold transition-all border border-white/10"
+                                className="w-full bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-3 rounded-xl font-bold transition-all border border-white/10 uppercase tracking-wider text-sm"
                             >
-                                + Add Another
+                                + Add Another Item
                             </button>
-                            <button type="submit" className="flex-[2] btn-primary flex justify-center items-center gap-2">
+                            <button type="submit" className="w-full btn-primary flex justify-center items-center gap-2 py-4">
                                 <Save size={18} />
                                 {stockQueue.length > 0
                                     ? `Save All (${stockQueue.length + (stockFormData.item_name ? 1 : 0)})`
@@ -398,15 +398,15 @@ const AddItem = () => {
                             </div>
                         )}
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3">
                             <button
                                 onClick={handleAddAnotherMeal}
                                 type="button"
-                                className="flex-1 bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-4 rounded-xl font-bold transition-all border border-white/10"
+                                className="w-full bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-3 rounded-xl font-bold transition-all border border-white/10 uppercase tracking-wider text-sm"
                             >
-                                + Add Another
+                                + Add Another Meal
                             </button>
-                            <button type="submit" className="flex-[2] btn-primary flex justify-center items-center gap-2">
+                            <button type="submit" className="w-full btn-primary flex justify-center items-center gap-2 py-4">
                                 <Utensils size={18} />
                                 {mealQueue.length > 0
                                     ? `Log All (${mealQueue.length + (mealFormData.name ? 1 : 0)})`
