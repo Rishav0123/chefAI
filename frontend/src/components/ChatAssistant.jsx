@@ -3,10 +3,12 @@ import api from '../api';
 import { UserContext } from '../context/UserContext';
 import { Bot, X, Send, User, Sparkles, Play } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useNavigate } from 'react-router-dom';
 
 const ChatAssistant = () => {
     const { user, triggerStockRefresh } = useContext(UserContext);
     const [messages, setMessages] = useState([]);
+    const navigate = useNavigate();
 
     // Proactive Welcome Message
     useEffect(() => {
@@ -70,6 +72,14 @@ const ChatAssistant = () => {
             if (res.data.actions && res.data.actions.includes("MEAL_LOGGED")) {
                 showToast("🍲 Kitchen Updated! Ingredients removed from stock.");
                 triggerStockRefresh();
+            }
+
+            if (res.data.actions && res.data.actions.includes("DRAFT_MEAL") && res.data.redirect_payload) {
+                showToast("📝 Opening Meal Log...");
+                // Small delay to let user see the "Draft created" message
+                setTimeout(() => {
+                    navigate('/add?mode=meal', { state: { draft: res.data.redirect_payload } });
+                }, 1500);
             }
         } catch (error) {
             console.error(error);

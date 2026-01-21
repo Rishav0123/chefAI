@@ -33,8 +33,29 @@ const AddItem = () => {
         calories: '',
         protein_g: '',
         carbs_g: '',
-        fat_g: ''
+        fat_g: '',
+        ingredients_used: []
     });
+
+    // Check for Draft Data from Chatbot
+    useEffect(() => {
+        if (location.state?.draft) {
+            const draft = location.state.draft;
+            console.log("Draft loaded:", draft);
+
+            setMealFormData({
+                name: draft.name || '',
+                meal_type: draft.meal_type || 'other',
+                meal_source: draft.deduct_stock ? 'home' : 'out', // deduct_stock=true means home
+                calories: draft.nutrition?.calories || '',
+                protein_g: draft.nutrition?.protein || '',
+                carbs_g: draft.nutrition?.carbs || '',
+                fat_g: draft.nutrition?.fat || '',
+                ingredients_used: draft.ingredients || []
+            });
+            setActiveTab('meal');
+        }
+    }, [location.state]);
 
     // Fetch existing stock for autocomplete
     useEffect(() => {
@@ -91,7 +112,7 @@ const AddItem = () => {
                 name: mealFormData.name,
                 meal_type: mealFormData.meal_type,
                 meal_source: mealFormData.meal_source,
-                ingredients_used: [], // Manual entry assumes no specific ingredient deduction for now unless complex logic added
+                ingredients_used: mealFormData.ingredients_used, // Use drafted ingredients if available
                 confidence: 100,
                 calories: parseInt(mealFormData.calories) || 0,
                 protein_g: parseInt(mealFormData.protein_g) || 0,

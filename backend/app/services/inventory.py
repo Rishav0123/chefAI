@@ -35,16 +35,19 @@ class QuantityParser:
             unit = unit_map.get(unit, unit)
 
             return amount, unit
+        
+        return None, None
+
     @staticmethod
     def get_base_unit(unit: str):
         """Returns (base_unit, factor_to_base)"""
-        # Mass
+        # Mass (base: g)
         if unit in ["kg", "g", "mg"]:
             if unit == "kg": return "g", 1000.0
             if unit == "mg": return "g", 0.001
             return "g", 1.0
         
-        # Volume
+        # Volume (base: ml)
         if unit in ["l", "ml", "tbsp", "tsp", "cup"]:
             if unit == "l": return "ml", 1000.0
             if unit == "tbsp": return "ml", 15.0
@@ -56,20 +59,32 @@ class QuantityParser:
 
     @staticmethod
     def convert(amount: float, from_unit: str, to_unit: str):
-        """Converts amount from one unit to another if compatible."""
+        """
+        Converts amount from one unit to another.
+        Supports Mass encoded as Volume via basic density assumption (1g = 1ml) to prevent errors.
+        """
         if from_unit == to_unit:
             return amount
             
         base1, factor1 = QuantityParser.get_base_unit(from_unit)
         base2, factor2 = QuantityParser.get_base_unit(to_unit)
         
+        # Calculate amount in Base 1
+        amount_base1 = amount * factor1
+
+        # Handle incompatible base units (e.g. g vs ml)
         if base1 != base2:
-            return None # Incompatible
+            # Simple Density Fallback: 1 g ~= 1 ml
+            # This handles "Stock: 1kg (1000g)" vs "Used: 1 cup (240ml)"
+            if (base1 == "g" and base2 == "ml") or (base1 == "ml" and base2 == "g"):
+                # Treat 1g = 1ml
+                amount_base2 = amount_base1 
+                return amount_base2 / factor2
             
-        # Convert to base, then to target
-        # amount * factor1 = amount_in_base
-        # amount_in_base / factor2 = amount_in_target
-        return (amount * factor1) / factor2
+            return None # Truly incompatible (e.g. 'pcs' vs 'g')
+            
+        # Standard conversion
+        return amount_base1 / factor2
 
     @staticmethod
     def format(amount: float, unit: str):

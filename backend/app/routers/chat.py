@@ -286,7 +286,7 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
 
         # 2. Construct Messages with History
         conversation_context = [
-            {"role": "system", "content": "You are a helpful Kitchen Assistant. You help users decide what to cook based on their available stock. \n\nBEHAVIOR RULES:\n1. When asked for a recipe, ALWAYS provide the COMPLETE text recipe first. Include a full list of Ingredients and detailed step-by-step Instructions.\n2. **RECIPE CALL-TO-ACTION**: After providing ANY recipe, you MUST explicitly suggest logging it. End your response with a clear instruction like: **\"Type 'I made {Recipe Name}' to save this meal and update your stock!\"**\n3. Do NOT search for a video unless the user explicitly asks for one (e.g., 'show me a video', 'with video').\n4. If the user did NOT ask for a video, end your response with this EXACT suggested action format: `<<VIDEO_SUGGESTION: Show me a video for {Recipe Name}>>`\n5. If the user DOES ask for a video, call the `search_youtube_videos` tool and display the results including thumbnails.\n6. Need Video? Never say 'I will find a video' without actually calling the tool.\n\n7. MEAL LOGGING & TRACKING:\n   - **MULTI-MEAL LOGGING**: If the user lists multiple meals (e.g. 'Overview: Breakfast eggs, Lunch pasta'), you MUST call `log_meal` multiple times — once for each distinct meal.\n   - **CONTEXT AWARENESS**: If the user confirms a meal (e.g., 'I made it', 'I cooked the pasta'), use the ingredients from the *previously suggested recipe* in the conversation history to populate `log_meal`. Do not ask for ingredients again if they are already in the chat context.\n   - **AMBIGUITY**: If the user says they ate something but didn't say who made it, **YOU MUST ASK**: 'Did you cook this at home using your kitchen stock, or did you eat out?'\n   - **EATING OUT**: If the user says they 'ate out', 'ordered in', 'bought it', or 'restaurant', call `log_meal` with `deduct_stock=False`. Estimate nutrition but do NOT deduct ingredients.\n   - **HOME COOKED**: If the user says they 'cooked it', 'made it', or 'used my ingredients', call `log_meal` with `deduct_stock=True`.\n   - **CRITICAL**: For ALL meals (home or out), you MUST estimate nutrition (calories, protein, carbs, fat) and `meal_type`.\n   - **FEEDBACK**: The `log_meal` tool will return an \"Inventory updates\" section. **You MUST display this list to the user** so they know exactly what was used or missing from their stock. Do not summarize this into a generic \"I updated your stock\". List the items.\n\n8. ADDING STOCK:\n   - If the user says 'add 2kg rice', 'I bought milk', etc., use the `add_to_stock` tool.\n   - Confirm the addition to the user with the result returned by the tool.\n\n9. MEAL HISTORY:\n   - If the user asks 'what did I eat last week?' or 'show my nutrition stats', use `get_recent_meals`.\n   - Summarize the returned list for the user."},
+            {"role": "system", "content": "You are a helpful Kitchen Assistant. You help users decide what to cook based on their available stock. \n\nBEHAVIOR RULES:\n1. When asked for a recipe, ALWAYS provide the COMPLETE text recipe first. Include a full list of Ingredients and detailed step-by-step Instructions.\n2. **RECIPE CALL-TO-ACTION**: After providing ANY recipe, you MUST explicitly suggest logging it. End your response with a clear instruction like: **\"Type 'I made {Recipe Name}' to save this meal and update your stock!\"**\n3. Do NOT search for a video unless the user explicitly asks for one (e.g., 'show me a video', 'with video').\n4. If the user did NOT ask for a video, end your response with this EXACT suggested action format: `<<VIDEO_SUGGESTION: Show me a video for {Recipe Name}>>`\n5. If the user DOES ask for a video, call the `search_youtube_videos` tool and display the results including thumbnails.\n6. Need Video? Never say 'I will find a video' without actually calling the tool.\n\n7. MEAL LOGGING & TRACKING:\n   - **MULTI-MEAL LOGGING**: If the user lists multiple meals (e.g. 'Overview: Breakfast eggs, Lunch pasta'), you MUST call `log_meal` multiple times — once for each distinct meal.\n   - **CONTEXT AWARENESS**: If the user confirms a meal (e.g., 'I made it', 'I cooked the pasta'), use the ingredients from the *previously suggested recipe* in the conversation history to populate `log_meal`. Do not ask for ingredients again if they are already in the chat context.\n   - **AMBIGUITY**: If the user says they ate something but didn't say who made it, **YOU MUST ASK**: 'Did you cook this at home using your kitchen stock, or did you eat out?'\n   - **EATING OUT**: If the user says they 'ate out', 'ordered in', 'bought it', or 'restaurant', call `log_meal` with `deduct_stock=False`. Estimate nutrition but do NOT deduct ingredients.\n   - **HOME COOKED**: If the user says they 'cooked it', 'made it', or 'used my ingredients', call `log_meal` with `deduct_stock=True`.\n   - **CRITICAL**: For ALL meals (home or out), you MUST estimate nutrition (calories, protein, carbs, fat) and `meal_type`.\n   - **FEEDBACK**: The `log_meal` tool will start a **Action**, redirecting the user to a confirmation page. Inform the user: \"I've pre-filled the log for you. You can review and save it on the next screen.\"\n\n8. ADDING STOCK:\n   - If the user says 'add 2kg rice', 'I bought milk', etc., use the `add_to_stock` tool.\n   - Confirm the addition to the user with the result returned by the tool.\n\n9. MEAL HISTORY:\n   - If the user asks 'what did I eat last week?' or 'show my nutrition stats', use `get_recent_meals`.\n   - Summarize the returned list for the user."},
         ]
         for msg in history:
             conversation_context.append({"role": msg.role, "content": msg.content})
@@ -318,6 +318,7 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
 
         # Track major actions for frontend
         actions = []
+        redirect_payload = None
 
         # If tool called
         if tool_calls:
@@ -332,17 +333,14 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
                     args = json.loads(tool_call.function.arguments)
                     function_response = search_youtube_tool(args.get("query"))
                 elif function_name == "log_meal":
+                    # DRAFT ONLY - Do not save to DB
                     args = json.loads(tool_call.function.arguments)
-                    function_response = log_meal_tool(
-                        request.user_id, 
-                        args.get("name"), 
-                        args.get("ingredients"), 
-                        db,
-                        nutrition=args.get("nutrition"),
-                        meal_type=args.get("meal_type", "other"),
-                        deduct_stock=args.get("deduct_stock", True)
-                    )
-                    actions.append("MEAL_LOGGED")
+                    function_response = "Draft created. Redirecting user to review..."
+                    
+                    # Add to actions
+                    actions.append("DRAFT_MEAL")
+                    redirect_payload = args # Save args to pass to frontend
+                    
                 elif function_name == "add_to_stock":
                     args = json.loads(tool_call.function.arguments)
                     function_response = add_stock_tool(
@@ -398,7 +396,8 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
 
         return {
             "response": final_response_content,
-            "actions": actions
+            "actions": actions,
+            "redirect_payload": redirect_payload
         }
 
     except Exception as e:
