@@ -529,6 +529,8 @@ const AddItem = () => {
                                         <div className="flex gap-4 text-xs text-stone-400 mt-3 pt-3 border-t border-white/5">
                                             {m.calories && <span className="flex items-center gap-1"><Flame size={10} /> {m.calories} kcal</span>}
                                             {m.protein_g && <span className="flex items-center gap-1"><Utensils size={10} /> {m.protein_g}g pro</span>}
+                                            {m.carbs_g && <span className="flex items-center gap-1"><Wheat size={10} /> {m.carbs_g}g carb</span>}
+                                            {m.fat_g && <span className="flex items-center gap-1"><Droplet size={10} /> {m.fat_g}g fat</span>}
                                         </div>
                                     )}
 
