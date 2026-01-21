@@ -74,11 +74,11 @@ const ChatAssistant = () => {
                 triggerStockRefresh();
             }
 
-            if (res.data.actions && res.data.actions.includes("DRAFT_MEAL") && res.data.redirect_payload) {
+            if (res.data.actions && res.data.actions.includes("DRAFT_MEAL") && res.data.redirect_payloads) {
                 showToast("📝 Opening Meal Log...");
                 // Small delay to let user see the "Draft created" message
                 setTimeout(() => {
-                    navigate('/add?mode=meal', { state: { draft: res.data.redirect_payload } });
+                    navigate('/add?mode=meal', { state: { drafts: res.data.redirect_payloads } });
                 }, 1500);
             }
         } catch (error) {

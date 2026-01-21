@@ -318,7 +318,7 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
 
         # Track major actions for frontend
         actions = []
-        redirect_payload = None
+        redirect_payloads = []
 
         # If tool called
         if tool_calls:
@@ -338,8 +338,9 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
                     function_response = "Draft created. Redirecting user to review..."
                     
                     # Add to actions
-                    actions.append("DRAFT_MEAL")
-                    redirect_payload = args # Save args to pass to frontend
+                    if "DRAFT_MEAL" not in actions:
+                        actions.append("DRAFT_MEAL")
+                    redirect_payloads.append(args) 
                     
                 elif function_name == "add_to_stock":
                     args = json.loads(tool_call.function.arguments)
@@ -397,7 +398,7 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
         return {
             "response": final_response_content,
             "actions": actions,
-            "redirect_payload": redirect_payload
+            "redirect_payloads": redirect_payloads
         }
 
     except Exception as e:

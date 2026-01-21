@@ -23,6 +23,7 @@ const AddItem = () => {
         category: '',
         expiry_date: '',
     });
+    const [stockQueue, setStockQueue] = useState([]);
     const [existingStockNames, setExistingStockNames] = useState([]);
 
     // --- Meal Form State ---
@@ -36,17 +37,49 @@ const AddItem = () => {
         fat_g: '',
         ingredients_used: []
     });
+    const [mealQueue, setMealQueue] = useState([]);
 
     // Check for Draft Data from Chatbot
     useEffect(() => {
-        if (location.state?.draft) {
-            const draft = location.state.draft;
-            console.log("Draft loaded:", draft);
+        if (location.state?.drafts) {
+            const drafts = location.state.drafts;
+            console.log("Drafts loaded:", drafts);
 
+            // Queue all except last
+            if (drafts.length > 1) {
+                const queueItems = drafts.slice(0, -1).map(d => ({
+                    name: d.name || '',
+                    meal_type: d.meal_type || 'other',
+                    meal_source: d.deduct_stock ? 'home' : 'out',
+                    calories: d.nutrition?.calories || '',
+                    protein_g: d.nutrition?.protein || '',
+                    carbs_g: d.nutrition?.carbs || '',
+                    fat_g: d.nutrition?.fat || '',
+                    ingredients_used: d.ingredients || []
+                }));
+                setMealQueue(queueItems);
+            }
+
+            // Set active form to last draft
+            const lastDraft = drafts[drafts.length - 1];
+            setMealFormData({
+                name: lastDraft.name || '',
+                meal_type: lastDraft.meal_type || 'other',
+                meal_source: lastDraft.deduct_stock ? 'home' : 'out',
+                calories: lastDraft.nutrition?.calories || '',
+                protein_g: lastDraft.nutrition?.protein || '',
+                carbs_g: lastDraft.nutrition?.carbs || '',
+                fat_g: lastDraft.nutrition?.fat || '',
+                ingredients_used: lastDraft.ingredients || []
+            });
+            setActiveTab('meal');
+        } else if (location.state?.draft) {
+            // Legacy fallback
+            const draft = location.state.draft;
             setMealFormData({
                 name: draft.name || '',
                 meal_type: draft.meal_type || 'other',
-                meal_source: draft.deduct_stock ? 'home' : 'out', // deduct_stock=true means home
+                meal_source: draft.deduct_stock ? 'home' : 'out',
                 calories: draft.nutrition?.calories || '',
                 protein_g: draft.nutrition?.protein || '',
                 carbs_g: draft.nutrition?.carbs || '',
@@ -74,25 +107,39 @@ const AddItem = () => {
         setStockFormData({ ...stockFormData, [e.target.name]: e.target.value });
     };
 
+    const handleAddAnotherStock = (e) => {
+        e.preventDefault();
+        if (!stockFormData.item_name) return;
+        setStockQueue([...stockQueue, stockFormData]);
+        setStockFormData({ item_name: '', quantity_num: '', unit: 'g', category: '', expiry_date: '' });
+    };
+
     const handleStockSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const quantity = `${stockFormData.quantity_num} ${stockFormData.unit}`;
-            const payload = {
-                user_id: user.id,
-                item_name: stockFormData.item_name,
-                quantity: quantity,
-                category: stockFormData.category,
-                expiry_date: stockFormData.expiry_date || undefined
-            };
+            // Combine queue + current (if filled)
+            const itemsToSave = [...stockQueue];
+            if (stockFormData.item_name) itemsToSave.push(stockFormData);
 
-            await api.post('/stock/', payload);
+            if (itemsToSave.length === 0) return;
+
+            // Save all in parallel
+            await Promise.all(itemsToSave.map(item => {
+                const quantity = `${item.quantity_num} ${item.unit}`;
+                return api.post('/stock/', {
+                    user_id: user.id,
+                    item_name: item.item_name,
+                    quantity: quantity,
+                    category: item.category,
+                    expiry_date: item.expiry_date || undefined
+                });
+            }));
+
             navigate('/');
         } catch (error) {
-            console.error("Error adding item:", error);
-            const msg = error.response?.data?.detail || error.message || "Unknown Error";
-            alert(`Failed: ${msg}`);
+            console.error("Error adding items:", error);
+            alert(`Failed: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -103,28 +150,44 @@ const AddItem = () => {
         setMealFormData({ ...mealFormData, [e.target.name]: e.target.value });
     };
 
+    const handleAddAnotherMeal = (e) => {
+        e.preventDefault();
+        if (!mealFormData.name) return;
+        setMealQueue([...mealQueue, mealFormData]);
+        setMealFormData({
+            name: '', meal_type: 'other', meal_source: 'home',
+            calories: '', protein_g: '', carbs_g: '', fat_g: '', ingredients_used: []
+        });
+    };
+
     const handleMealSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const payload = {
-                user_id: user.id,
-                name: mealFormData.name,
-                meal_type: mealFormData.meal_type,
-                meal_source: mealFormData.meal_source,
-                ingredients_used: mealFormData.ingredients_used, // Use drafted ingredients if available
-                confidence: 100,
-                calories: parseInt(mealFormData.calories) || 0,
-                protein_g: parseInt(mealFormData.protein_g) || 0,
-                carbs_g: parseInt(mealFormData.carbs_g) || 0,
-                fat_g: parseInt(mealFormData.fat_g) || 0
-            };
+            const mealsToSave = [...mealQueue];
+            if (mealFormData.name) mealsToSave.push(mealFormData);
 
-            await api.post('/meals/', payload);
+            if (mealsToSave.length === 0) return;
+
+            await Promise.all(mealsToSave.map(meal => {
+                return api.post('/meals/', {
+                    user_id: user.id,
+                    name: meal.name,
+                    meal_type: meal.meal_type,
+                    meal_source: meal.meal_source,
+                    ingredients_used: meal.ingredients_used || [],
+                    confidence: 100,
+                    calories: parseInt(meal.calories) || 0,
+                    protein_g: parseInt(meal.protein_g) || 0,
+                    carbs_g: parseInt(meal.carbs_g) || 0,
+                    fat_g: parseInt(meal.fat_g) || 0
+                });
+            }));
+
             navigate('/');
         } catch (error) {
-            console.error("Error adding meal:", error);
-            alert("Failed to add meal");
+            console.error("Error adding meals:", error);
+            alert("Failed to add meals");
         } finally {
             setLoading(false);
         }
@@ -220,9 +283,37 @@ const AddItem = () => {
                             </select>
                         </div>
 
-                        <button type="submit" className="btn-primary w-full flex justify-center items-center gap-2">
-                            <Save size={18} /> Save to Stock
-                        </button>
+                        {/* Queue Summary */}
+                        {stockQueue.length > 0 && (
+                            <div className="bg-stone-800/50 p-4 rounded-xl border border-white/10 mb-4">
+                                <h4 className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">Ready to Add ({stockQueue.length})</h4>
+                                <ul className="space-y-1">
+                                    {stockQueue.map((item, i) => (
+                                        <li key={i} className="text-white text-sm flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
+                                            {item.item_name} <span className="text-stone-500">({item.quantity_num} {item.unit})</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleAddAnotherStock}
+                                type="button"
+                                className="flex-1 bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-4 rounded-xl font-bold transition-all border border-white/10"
+                            >
+                                + Add Another
+                            </button>
+                            <button type="submit" className="flex-[2] btn-primary flex justify-center items-center gap-2">
+                                <Save size={18} />
+                                {stockQueue.length > 0
+                                    ? `Save All (${stockQueue.length + (stockFormData.item_name ? 1 : 0)})`
+                                    : "Save to Stock"
+                                }
+                            </button>
+                        </div>
                     </form>
                 ) : (
                     <form onSubmit={handleMealSubmit} className="space-y-6">
@@ -292,9 +383,37 @@ const AddItem = () => {
                             </div>
                         </div>
 
-                        <button type="submit" className="btn-primary w-full flex justify-center items-center gap-2">
-                            <Save size={18} /> Log Meal
-                        </button>
+                        {/* Queue Summary */}
+                        {mealQueue.length > 0 && (
+                            <div className="bg-stone-800/50 p-4 rounded-xl border border-white/10 mb-4">
+                                <h4 className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">Ready to Log ({mealQueue.length})</h4>
+                                <ul className="space-y-1">
+                                    {mealQueue.map((m, i) => (
+                                        <li key={i} className="text-white text-sm flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                                            {m.name} <span className="text-stone-500">({m.meal_type})</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleAddAnotherMeal}
+                                type="button"
+                                className="flex-1 bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-4 rounded-xl font-bold transition-all border border-white/10"
+                            >
+                                + Add Another
+                            </button>
+                            <button type="submit" className="flex-[2] btn-primary flex justify-center items-center gap-2">
+                                <Utensils size={18} />
+                                {mealQueue.length > 0
+                                    ? `Log All (${mealQueue.length + (mealFormData.name ? 1 : 0)})`
+                                    : "Log Meal"
+                                }
+                            </button>
+                        </div>
                     </form>
                 )}
             </div>
