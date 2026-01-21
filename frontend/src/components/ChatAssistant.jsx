@@ -81,6 +81,14 @@ const ChatAssistant = () => {
                     navigate('/add?mode=meal', { state: { drafts: res.data.redirect_payloads } });
                 }, 1500);
             }
+
+            if (res.data.actions && res.data.actions.includes("DRAFT_STOCK") && res.data.redirect_payloads) {
+                showToast("📦 Opening Stock Entry...");
+                // Small delay to let user see the "Draft created" message
+                setTimeout(() => {
+                    navigate('/add?mode=stock', { state: { stockDrafts: res.data.redirect_payloads } });
+                }, 1500);
+            }
         } catch (error) {
             console.error(error);
             setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting to the kitchen server. Please try again." }]);

@@ -343,14 +343,13 @@ async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
                     redirect_payloads.append(args) 
                     
                 elif function_name == "add_to_stock":
+                    # DRAFT ONLY - Do not save to DB
                     args = json.loads(tool_call.function.arguments)
-                    function_response = add_stock_tool(
-                        request.user_id,
-                        args.get("item_name"),
-                        args.get("quantity"),
-                        db
-                    )
-                    actions.append("STOCK_UPDATED")
+                    function_response = "Draft created. Redirecting user to review..."
+                    
+                    if "DRAFT_STOCK" not in actions:
+                        actions.append("DRAFT_STOCK")
+                    redirect_payloads.append(args)
                 elif function_name == "get_recent_meals":
                     args = json.loads(tool_call.function.arguments)
                     function_response = get_recent_meals_tool(

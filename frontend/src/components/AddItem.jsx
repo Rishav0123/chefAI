@@ -87,6 +87,40 @@ const AddItem = () => {
                 ingredients_used: draft.ingredients || []
             });
             setActiveTab('meal');
+        } else if (location.state?.stockDrafts) {
+            const drafts = location.state.stockDrafts;
+            console.log("Stock Drafts loaded:", drafts);
+
+            const mapDraft = (d) => {
+                let qStr = (d.quantity || "").toString().toLowerCase();
+                let num = parseFloat(qStr) || '';
+                let unit = 'pcs';
+
+                if (qStr.includes('kg')) { num = (parseFloat(qStr) || 0) * 1000; unit = 'g'; }
+                else if (qStr.includes('mg')) { num = (parseFloat(qStr) || 0) / 1000; unit = 'g'; }
+                else if (qStr.includes('ml')) { unit = 'ml'; }
+                else if (qStr.includes('l') && !qStr.includes('ml')) { num = (parseFloat(qStr) || 0) * 1000; unit = 'ml'; }
+                else if (qStr.includes('g')) { unit = 'g'; }
+
+                return {
+                    item_name: d.item_name || '',
+                    quantity_num: num,
+                    unit: ['g', 'ml', 'pcs'].includes(unit) ? unit : 'pcs',
+                    category: '',
+                    expiry_date: ''
+                };
+            };
+
+            // Queue all except last
+            if (drafts.length > 1) {
+                setStockQueue(drafts.slice(0, -1).map(mapDraft));
+            }
+
+            // Set active form to last draft
+            if (drafts.length > 0) {
+                setStockFormData(mapDraft(drafts[drafts.length - 1]));
+            }
+            setActiveTab('stock');
         }
     }, [location.state]);
 
