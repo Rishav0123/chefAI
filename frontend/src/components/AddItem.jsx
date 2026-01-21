@@ -422,9 +422,18 @@ const AddItem = () => {
                         {/* Ingredients Section (Only for Home Cooked) */}
                         {mealFormData.meal_source === 'home' && (
                             <div className="bg-stone-800/30 p-4 rounded-xl space-y-3 border border-white/5">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 flex items-center gap-2">
-                                    <Box size={16} /> Ingredients Used
-                                </h3>
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 flex items-center gap-2">
+                                        <Box size={16} /> Ingredients Used
+                                    </h3>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleEstimate('ingredients')}
+                                        className="text-xs flex items-center gap-1 text-accent hover:text-orange-400 bg-stone-900 px-2 py-1 rounded-lg border border-orange-500/20 transition-all"
+                                    >
+                                        <Sparkles size={12} /> Auto-Fill
+                                    </button>
+                                </div>
 
                                 {/* List of Added Ingredients */}
                                 {mealFormData.ingredients_used.length > 0 && (
