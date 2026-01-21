@@ -205,7 +205,8 @@ const UploadBill = ({ mode = 'bill' }) => {
             const payload = {
                 user_id: user.id,
                 name: mealData.name,
-                ingredients_used: mealData.ingredients,
+                // Only send ingredients if source is home (double safety)
+                ingredients_used: mealSource === 'home' ? mealData.ingredients : [],
                 confidence: 90,
                 meal_type: mealData.meal_type,
                 meal_source: mealSource,
@@ -299,9 +300,10 @@ const UploadBill = ({ mode = 'bill' }) => {
                         </div>
 
                         {/* Ingredients (Read Only for now, roughly) - Only show for Home Cooked */}
-                        {mealSource === 'home' && (
+                        {/* Ingredients - Only displayed for Home Cooked meals where deduction applies */}
+                        {mealSource === 'home' ? (
                             <div className="glass-panel p-6">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 mb-4">Detected Ingredients</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 mb-4">Ingredients to Deduct</h3>
                                 <div className="space-y-2">
                                     {mealData.ingredients.map((ing, idx) => (
                                         <div key={idx} className="flex justify-between items-center text-sm p-2 bg-white/5 rounded">
@@ -312,7 +314,7 @@ const UploadBill = ({ mode = 'bill' }) => {
                                     {mealData.ingredients.length === 0 && <p className="text-stone-500 text-sm">No ingredients extracted.</p>}
                                 </div>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 ) : (
                     // --- Stock Review UI ---
