@@ -298,19 +298,21 @@ const UploadBill = ({ mode = 'bill' }) => {
                             </div>
                         </div>
 
-                        {/* Ingredients (Read Only for now, roughly) */}
-                        <div className="glass-panel p-6">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 mb-4">Detected Ingredients</h3>
-                            <div className="space-y-2">
-                                {mealData.ingredients.map((ing, idx) => (
-                                    <div key={idx} className="flex justify-between items-center text-sm p-2 bg-white/5 rounded">
-                                        <span className="text-white">{ing.item}</span>
-                                        <span className="text-stone-400">{ing.qty}</span>
-                                    </div>
-                                ))}
-                                {mealData.ingredients.length === 0 && <p className="text-stone-500 text-sm">No ingredients extracted.</p>}
+                        {/* Ingredients (Read Only for now, roughly) - Only show for Home Cooked */}
+                        {mealSource === 'home' && (
+                            <div className="glass-panel p-6">
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 mb-4">Detected Ingredients</h3>
+                                <div className="space-y-2">
+                                    {mealData.ingredients.map((ing, idx) => (
+                                        <div key={idx} className="flex justify-between items-center text-sm p-2 bg-white/5 rounded">
+                                            <span className="text-white">{ing.item}</span>
+                                            <span className="text-stone-400">{ing.qty}</span>
+                                        </div>
+                                    ))}
+                                    {mealData.ingredients.length === 0 && <p className="text-stone-500 text-sm">No ingredients extracted.</p>}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 ) : (
                     // --- Stock Review UI ---
