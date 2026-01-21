@@ -534,6 +534,20 @@ const AddItem = () => {
                                         </div>
                                     )}
 
+                                    {/* Ingredients Mini-List */}
+                                    {m.ingredients_used && m.ingredients_used.length > 0 && (
+                                        <div className="mt-3 pt-3 border-t border-white/5">
+                                            <p className="text-xs text-stone-500 font-bold uppercase tracking-widest mb-2">Ingredients</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {m.ingredients_used.map((ing, idx) => (
+                                                    <span key={idx} className="text-xs bg-stone-900 text-stone-300 px-2 py-1 rounded border border-white/5">
+                                                        {ing.item} <span className="text-stone-500">({ing.qty})</span>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Delete Button (Visual Only for now, logic needed) */}
                                     <button
                                         type="button"
