@@ -244,6 +244,10 @@ TOOLS = [
                     "quantity": {
                         "type": "string",
                         "description": "Quantity with unit (e.g. '2 kg', '1 liter', '5 pcs')."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Category of the item (e.g. 'vegetable', 'fruit', 'dairy', 'spice', 'grain')."
                     }
                 },
                 "required": ["item_name", "quantity"]

@@ -79,13 +79,30 @@ const AddItem = () => {
             setMealFormData({
                 name: draft.name || '',
                 meal_type: draft.meal_type || 'other',
-                meal_source: draft.deduct_stock ? 'home' : 'out',
+                meal_source: (draft.deduct_stock || (draft.ingredients && draft.ingredients.length > 0)) ? 'home' : 'outside',
                 calories: draft.nutrition?.calories || '',
                 protein_g: draft.nutrition?.protein || '',
                 carbs_g: draft.nutrition?.carbs || '',
                 fat_g: draft.nutrition?.fat || '',
                 ingredients_used: draft.ingredients || []
             });
+
+            // If we have ingredients but meal_source is 'out' (maybe explicitly set or defaulted),
+            // we should probably ensure they are visible or at least default to 'home' if ambiguous?
+            // But let's stick to the draft's explicit intent. 
+            // However, Chatbot often infers 'deduct_stock' poorly.
+            // Let's force 'home' if ingredients are provided to ensure they are seen?
+            // "deduct_stock" property from Chatbot is robust usually.
+            // Let's check if the issue is actually property name mismatch in Chatbot output?
+            // Chatbot tool definition: "ingredients": [{"item": "...", "qty": "..."}]
+            // AddItem expects: ingredients_used: [{item: "...", qty: "..."}]
+            // Matches.
+
+            // Maybe the issue is simple: draft.ingredients is undefined?
+            // If I look at the previous `UploadBill.jsx` redirection for meal:
+            // ingredients: data.ingredients || []
+            // That works.
+
             setActiveTab('meal');
         } else if (location.state?.stockDrafts) {
             const drafts = location.state.stockDrafts;
@@ -106,7 +123,7 @@ const AddItem = () => {
                     item_name: d.item_name || '',
                     quantity_num: num,
                     unit: ['g', 'ml', 'pcs'].includes(unit) ? unit : 'pcs',
-                    category: '',
+                    category: d.category || '',
                     expiry_date: ''
                 };
             };
