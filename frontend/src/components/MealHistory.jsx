@@ -55,9 +55,9 @@ const MealHistory = (props) => {
 
     // Helper: Render Card
     const renderMealCard = (meal) => (
-        <div key={meal.id} className="glass-panel p-6 relative group hover:scale-[1.02] transition-transform">
-            <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-white truncate pr-4">{meal.name}</h3>
+        <div key={meal.id} className="glass-panel p-4 md:p-6 relative group hover:scale-[1.02] transition-transform">
+            <div className="flex justify-between items-start mb-3 md:mb-4">
+                <h3 className="text-lg md:text-xl font-bold text-white truncate pr-4">{meal.name}</h3>
                 <div className="flex items-center gap-1 text-xs font-medium text-stone-400 bg-white/5 px-2 py-1 rounded-lg">
                     <Clock size={12} />
                     {meal.created_at ? new Date(meal.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
@@ -100,8 +100,8 @@ const MealHistory = (props) => {
                 <div className="mb-10 animate-fade-in">
                     <div className="mb-8 flex justify-between items-end">
                         <div>
-                            <h2 className="text-4xl font-black text-white mb-2">Meal History</h2>
-                            <p className="text-stone-400">Track your culinary journey and nutrition.</p>
+                            <h2 className="text-2xl md:text-4xl font-black text-white mb-2">Meal History</h2>
+                            <p className="text-sm md:text-base text-stone-400">Track your culinary journey and nutrition.</p>
                         </div>
                         <Link to="/add?mode=meal" className="btn-primary flex items-center gap-2">
                             <Plus size={18} />
@@ -110,17 +110,17 @@ const MealHistory = (props) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                        <div className="glass-panel p-6 flex flex-col justify-between border-blue-500/20 bg-blue-500/5">
+                        <div className="glass-panel p-4 md:p-6 flex flex-col justify-between border-blue-500/20 bg-blue-500/5">
                             <span className="text-blue-200 text-xs font-bold uppercase">Average Protein</span>
-                            <span className="text-4xl font-black text-blue-500 mt-2">{stats.avgProtein}g</span>
+                            <span className="text-3xl md:text-4xl font-black text-blue-500 mt-2">{stats.avgProtein}g</span>
                         </div>
-                        <div className="glass-panel p-6 flex flex-col justify-between border-orange-500/20 bg-orange-500/5">
+                        <div className="glass-panel p-4 md:p-6 flex flex-col justify-between border-orange-500/20 bg-orange-500/5">
                             <span className="text-orange-200 text-xs font-bold uppercase">Total Calories</span>
-                            <span className="text-4xl font-black text-orange-500 mt-2">{stats.totalCalories}</span>
+                            <span className="text-3xl md:text-4xl font-black text-orange-500 mt-2">{stats.totalCalories}</span>
                         </div>
-                        <div className="glass-panel p-6 flex flex-col justify-between">
+                        <div className="glass-panel p-4 md:p-6 flex flex-col justify-between">
                             <span className="text-stone-400 text-xs font-bold uppercase">Meals Logged</span>
-                            <span className="text-4xl font-black text-white mt-2">{stats.totalMeals}</span>
+                            <span className="text-3xl md:text-4xl font-black text-white mt-2">{stats.totalMeals}</span>
                         </div>
                     </div>
                 </div>

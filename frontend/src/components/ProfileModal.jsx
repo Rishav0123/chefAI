@@ -75,7 +75,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
             <div className="relative w-full max-w-md bg-[#1c1917] h-full shadow-2xl flex flex-col border-l border-white/10 animate-slide-in">
 
                 {/* Header */}
-                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-stone-900/50 backdrop-blur-md">
+                <div className="p-4 md:p-6 border-b border-white/5 flex items-center justify-between bg-stone-900/50 backdrop-blur-md">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-orange-500/20">
                             <User size={24} />
@@ -93,7 +93,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Body - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8">
 
                     {/* Section: Personal Info */}
                     <div className="space-y-4">
@@ -166,7 +166,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-white/5 bg-stone-900/50 backdrop-blur-md space-y-3">
+                <div className="p-4 md:p-6 border-t border-white/5 bg-stone-900/50 backdrop-blur-md space-y-3">
                     <button onClick={handleSave} disabled={loading} className="btn-primary w-full justify-center">
                         <Save size={20} />
                         Save Changes

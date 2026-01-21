@@ -14,6 +14,12 @@ const AddItem = () => {
     const initialTab = new URLSearchParams(location.search).get('mode') || 'stock';
     const [activeTab, setActiveTab] = useState(initialTab);
     const [loading, setLoading] = useState(false);
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
 
     // --- Stock Form State ---
     const [stockFormData, setStockFormData] = useState({
@@ -190,7 +196,7 @@ const AddItem = () => {
             navigate('/');
         } catch (error) {
             console.error("Error adding items:", error);
-            alert(`Failed: ${error.message}`);
+            showToast(`Failed: ${error.message}`, 'error');
         } finally {
             setLoading(false);
         }
@@ -232,7 +238,7 @@ const AddItem = () => {
 
     const handleEstimate = async (target) => {
         if (!mealFormData.name) {
-            alert("Please enter a Meal Name first!");
+            showToast("Please enter a Meal Name first!", 'error');
             return;
         }
 
@@ -265,7 +271,7 @@ const AddItem = () => {
 
         } catch (error) {
             console.error("Estimation failed:", error);
-            alert("Could not estimate data. Please try again.");
+            showToast("Could not estimate data. Please try again.", 'error');
         } finally {
             setLoading(false);
         }
@@ -298,7 +304,7 @@ const AddItem = () => {
             navigate('/');
         } catch (error) {
             console.error("Error adding meals:", error);
-            alert("Failed to add meals");
+            showToast("Failed to add meals. Please try again.", 'error');
         } finally {
             setLoading(false);
         }
@@ -309,24 +315,24 @@ const AddItem = () => {
             {loading && <LoadingOverlay message="Saving..." />}
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-6">
+            <div className="flex gap-2 md:gap-4 mb-4 md:mb-6">
                 <button
                     onClick={() => setActiveTab('stock')}
-                    className={`flex-1 p-4 rounded-xl flex items-center justify-center gap-2 transition-all ${activeTab === 'stock' ? 'bg-accent text-white shadow-lg shadow-orange-500/20' : 'bg-stone-900/50 text-stone-400 hover:bg-stone-800'}`}
+                    className={`flex-1 p-3 md:p-4 rounded-xl flex items-center justify-center gap-2 transition-all ${activeTab === 'stock' ? 'bg-accent text-white shadow-lg shadow-orange-500/20' : 'bg-stone-900/50 text-stone-400 hover:bg-stone-800'}`}
                 >
                     <Box size={20} />
-                    <span className="font-bold">Add Ingredient</span>
+                    <span className="font-bold text-sm md:text-base">Add Ingredient</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('meal')}
-                    className={`flex-1 p-4 rounded-xl flex items-center justify-center gap-2 transition-all ${activeTab === 'meal' ? 'bg-accent text-white shadow-lg shadow-orange-500/20' : 'bg-stone-900/50 text-stone-400 hover:bg-stone-800'}`}
+                    className={`flex-1 p-3 md:p-4 rounded-xl flex items-center justify-center gap-2 transition-all ${activeTab === 'meal' ? 'bg-accent text-white shadow-lg shadow-orange-500/20' : 'bg-stone-900/50 text-stone-400 hover:bg-stone-800'}`}
                 >
                     <Utensils size={20} />
-                    <span className="font-bold">Log Meal</span>
+                    <span className="font-bold text-sm md:text-base">Log Meal</span>
                 </button>
             </div>
 
-            <div className="glass-panel p-8">
+            <div className="glass-panel p-4 md:p-8">
                 {activeTab === 'stock' ? (
                     <form onSubmit={handleStockSubmit} className="space-y-6">
                         <div>
@@ -643,6 +649,15 @@ const AddItem = () => {
                     </form>
                 )}
             </div>
+            {/* Toast Notification */}
+            {toast && (
+                <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-bold z-[3000] animate-fade-in border border-white/10 whitespace-nowrap
+                    ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}
+                `}>
+                    {toast.type === 'error' ? <X size={20} /> : <Sparkles size={20} />}
+                    {toast.message}
+                </div>
+            )}
         </div>
     );
 };

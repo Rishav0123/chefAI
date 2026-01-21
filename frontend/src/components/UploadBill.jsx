@@ -162,33 +162,33 @@ const UploadBill = ({ mode = 'bill' }) => {
 
 
     return (
-        <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative', overflow: 'hidden' }}>
+        <div className="max-w-[600px] mx-auto relative overflow-hidden pb-24">
             {loading && (
                 <LoadingOverlay
                     message={status === 'review' ? "Saving..." : (isMealMode ? "Analyzing Nutrients..." : "AI Chef is reading...")}
                     subMessage={status === 'review' ? "Almost done!" : "Identifying items and quantities."}
                 />
             )}
-            <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
-                <div style={{ marginBottom: '1.5rem', display: 'inline-block', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}>
-                    <Icon size={48} color="var(--accent)" />
+            <div className="glass-panel p-6 md:p-8 text-center">
+                <div className="mb-6 inline-block p-4 bg-white/5 rounded-full">
+                    <Icon size={48} className="text-accent" />
                 </div>
-                <h2 style={{ marginBottom: '1rem' }}>{title}</h2>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+                <h2 className="mb-4 text-xl md:text-2xl font-bold text-white">{title}</h2>
+                <p className="text-stone-400 mb-8 max-w-sm mx-auto text-sm md:text-base">
                     {description}
                 </p>
 
-                <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', width: '100%' }}>
+                <form onSubmit={handleUpload} className="flex flex-col gap-6 items-center w-full">
 
-                    <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                    <div className="flex gap-4 w-full">
                         <input
                             type="file"
                             accept="image/*"
                             onChange={handleFileChange}
-                            style={{ display: 'none' }}
+                            className="hidden"
                             id="file-upload"
                         />
-                        <label htmlFor="file-upload" className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--accent)', cursor: 'pointer', flex: 1, textAlign: 'center' }}>
+                        <label htmlFor="file-upload" className="flex-1 btn-primary bg-transparent border border-accent cursor-pointer text-center py-3 md:py-4 transition-all hover:bg-accent/10">
                             {file ? "Change File" : "Choose Image"}
                         </label>
 
@@ -197,37 +197,37 @@ const UploadBill = ({ mode = 'bill' }) => {
                             accept="image/*"
                             capture="environment"
                             onChange={handleFileChange}
-                            style={{ display: 'none' }}
+                            className="hidden"
                             id="camera-upload"
                         />
-                        <label htmlFor="camera-upload" className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--accent)', cursor: 'pointer', flex: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <label htmlFor="camera-upload" className="flex-1 btn-primary bg-transparent border border-accent cursor-pointer text-center flex items-center justify-center gap-2 py-3 md:py-4 transition-all hover:bg-accent/10">
                             <Camera size={20} />
                             Take Photo
                         </label>
                     </div>
 
                     {file && (
-                        <div style={{ color: 'var(--text-secondary)' }}>Selected: {file.name}</div>
+                        <div className="text-stone-400 font-medium">Selected: {file.name}</div>
                     )}
 
                     {file && (
-                        <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%' }}>
+                        <button type="submit" className="btn-primary w-full py-4 text-base md:text-lg shadow-lg shadow-orange-500/20" disabled={loading}>
                             {loading ? 'Analyzing with AI...' : 'Upload & Process'}
                         </button>
                     )}
                 </form>
 
                 {status === 'success' && (
-                    <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(16, 185, 129, 0.2)', borderRadius: '8px', border: '1px solid #10b981', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <CheckCircle size={20} color="#10b981" />
-                        <span style={{ textAlign: 'left' }}>{message}</span>
+                    <div className="mt-5 p-4 bg-emerald-500/20 rounded-xl border border-emerald-500 flex items-center gap-3 animate-fade-in">
+                        <CheckCircle size={20} className="text-emerald-500 shrink-0" />
+                        <span className="text-left text-white text-sm">{message}</span>
                     </div>
                 )}
 
                 {status === 'error' && (
-                    <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(239, 68, 68, 0.2)', borderRadius: '8px', border: '1px solid #ef4444', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <AlertCircle size={20} color="#ef4444" />
-                        <span>{message}</span>
+                    <div className="mt-5 p-4 bg-red-500/20 rounded-xl border border-red-500 flex items-center gap-3 animate-fade-in">
+                        <AlertCircle size={20} className="text-red-500 shrink-0" />
+                        <span className="text-left text-white text-sm">{message}</span>
                     </div>
                 )}
             </div>

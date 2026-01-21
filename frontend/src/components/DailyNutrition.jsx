@@ -87,7 +87,7 @@ const DailyNutrition = () => {
     );
 
     return (
-        <div className="glass-panel p-6 relative overflow-hidden">
+        <div className="glass-panel p-4 md:p-6 relative overflow-hidden">
             {/* Decorative Background Blur */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-[50px] -mr-10 -mt-10 pointer-events-none"></div>
 
@@ -102,8 +102,8 @@ const DailyNutrition = () => {
             </div>
 
             {/* Calories (Big Display) */}
-            <div className="mb-8 text-center pt-2">
-                <div className="text-4xl font-black text-white mb-1 flex justify-center items-baseline gap-1">
+            <div className="mb-6 md:mb-8 text-center pt-2">
+                <div className="text-3xl md:text-4xl font-black text-white mb-1 flex justify-center items-baseline gap-1">
                     {Math.round(stats.calories)} <span className="text-sm text-stone-500 font-medium">kcal</span>
                 </div>
                 <div className="text-xs font-bold text-green-500 uppercase tracking-widest bg-green-500/10 py-1 px-3 rounded-full inline-block">

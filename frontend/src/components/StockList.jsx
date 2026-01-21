@@ -99,43 +99,43 @@ const StockList = (props) => {
 
     // Helper to render a single card (Used in both Widget and Full views)
     const renderStockCard = (item) => (
-        <div key={item.stock_id} className="glass-panel p-6 relative group transition-all hover:scale-[1.02]">
+        <div key={item.stock_id} className="glass-panel p-4 md:p-6 relative group transition-all hover:scale-[1.02]">
             {/* Category Indicator Dot */}
-            <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleEditClick(item)} className="p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-white transition-colors">
-                    <Edit2 size={16} />
+            <div className="absolute top-4 right-4 md:top-6 md:right-6 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <button onClick={() => handleEditClick(item)} className="p-1.5 md:p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-white transition-colors">
+                    <Edit2 size={14} className="md:w-4 md:h-4" />
                 </button>
-                <button onClick={() => handleDelete(item.stock_id)} className="p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-danger transition-colors">
-                    <Trash2 size={16} />
+                <button onClick={() => handleDelete(item.stock_id)} className="p-1.5 md:p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-danger transition-colors">
+                    <Trash2 size={14} className="md:w-4 md:h-4" />
                 </button>
             </div>
 
-            <div className="flex items-start justify-between mb-4">
-                <div className={`w-3 h-3 rounded-full mt-2 ${item.category === 'vegetable' ? 'bg-emerald-500' :
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+                <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full mt-2 ${item.category === 'vegetable' ? 'bg-emerald-500' :
                     item.category === 'fruit' ? 'bg-yellow-500' :
                         item.category === 'meat' ? 'bg-red-500' :
                             item.category === 'dairy' ? 'bg-blue-500' : 'bg-accent'
                     }`}></div>
             </div>
 
-            <h3 className="text-xl font-bold mb-2 text-white pr-10 truncate">{item.item_name}</h3>
+            <h3 className="text-lg md:text-xl font-bold mb-2 text-white pr-8 md:pr-10 truncate">{item.item_name}</h3>
 
-            <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                    <span className="text-stone-500 font-bold uppercase tracking-wider text-xs">Quantity</span>
-                    <span className="text-white font-bold bg-white/5 px-3 py-1 rounded-lg border border-white/5">
+            <div className="space-y-2 md:space-y-3">
+                <div className="flex items-center justify-between text-xs md:text-sm">
+                    <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px] md:text-xs">Quantity</span>
+                    <span className="text-white font-bold bg-white/5 px-2 py-0.5 md:px-3 md:py-1 rounded-lg border border-white/5">
                         {item.quantity || 'N/A'}
                     </span>
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
-                    <span className="text-stone-500 font-bold uppercase tracking-wider text-xs">Category</span>
+                <div className="flex items-center justify-between text-xs md:text-sm">
+                    <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px] md:text-xs">Category</span>
                     <span className="text-stone-400 capitalize">{item.category || 'Other'}</span>
                 </div>
 
                 {item.expiry_date && (
-                    <div className="flex items-center gap-2 text-xs font-medium text-danger bg-danger/10 px-3 py-2 rounded-lg mt-2">
-                        <Calendar size={12} />
+                    <div className="flex items-center gap-2 text-[10px] md:text-xs font-medium text-danger bg-danger/10 px-2 py-1.5 md:px-3 md:py-2 rounded-lg mt-1 md:mt-2">
+                        <Calendar size={10} className="md:w-3 md:h-3" />
                         <span>Expires {item.expiry_date}</span>
                     </div>
                 )}
@@ -177,60 +177,60 @@ const StockList = (props) => {
         <div>
             {/* Header / Stats Section */}
             {!props.limit ? (
-                <div className="mb-10 animate-fade-in">
-                    <div className="flex justify-between items-end mb-8">
+                <div className="mb-6 md:mb-10 animate-fade-in">
+                    <div className="flex justify-between items-end mb-6 md:mb-8">
                         <div>
-                            <h2 className="text-4xl font-black text-white mb-2">Kitchen Inventory</h2>
-                            <p className="text-stone-400">Manage your stock, track expiry, and organize your pantry.</p>
+                            <h2 className="text-2xl md:text-4xl font-black text-white mb-2">Kitchen Inventory</h2>
+                            <p className="text-sm md:text-base text-stone-400">Manage your stock, track expiry, and organize your pantry.</p>
                         </div>
-                        <Link to="/add" className="btn-primary flex items-center gap-2">
-                            <Package size={20} /> Add New Item
+                        <Link to="/add" className="btn-primary flex items-center gap-2 text-sm md:text-base px-4 py-2">
+                            <Package size={18} className="md:w-5 md:h-5" /> <span className="hidden md:inline">Add New Item</span><span className="md:hidden">Add</span>
                         </Link>
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                        <div className="glass-panel p-6 flex items-center justify-between bg-gradient-to-br from-orange-500/10 to-transparent border-orange-500/20">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+                        <div className="glass-panel p-4 md:p-6 flex items-center justify-between bg-gradient-to-br from-orange-500/10 to-transparent border-orange-500/20">
                             <div>
-                                <p className="text-orange-200 text-sm font-bold uppercase tracking-wider mb-1">Total Items</p>
-                                <h3 className="text-4xl font-black text-orange-500">{stats.total}</h3>
+                                <p className="text-orange-200 text-xs md:text-sm font-bold uppercase tracking-wider mb-1">Total Items</p>
+                                <h3 className="text-3xl md:text-4xl font-black text-orange-500">{stats.total}</h3>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
-                                <Tag size={24} />
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                                <Tag size={20} className="md:w-6 md:h-6" />
                             </div>
                         </div>
 
-                        <div className="glass-panel p-6 flex items-center justify-between">
+                        <div className="glass-panel p-4 md:p-6 flex items-center justify-between">
                             <div>
-                                <p className="text-stone-400 text-sm font-bold uppercase tracking-wider mb-1">Expiring Soon</p>
-                                <h3 className={`text-4xl font-black ${stats.expiringSoon > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                                <p className="text-stone-400 text-xs md:text-sm font-bold uppercase tracking-wider mb-1">Expiring Soon</p>
+                                <h3 className={`text-3xl md:text-4xl font-black ${stats.expiringSoon > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
                                     {stats.expiringSoon}
                                 </h3>
                             </div>
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${stats.expiringSoon > 0 ? 'bg-red-500/20 text-red-500' : 'bg-emerald-500/20 text-emerald-500'}`}>
-                                <Calendar size={24} />
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${stats.expiringSoon > 0 ? 'bg-red-500/20 text-red-500' : 'bg-emerald-500/20 text-emerald-500'}`}>
+                                <Calendar size={20} className="md:w-6 md:h-6" />
                             </div>
                         </div>
 
-                        <div className="glass-panel p-6 flex items-center justify-between">
+                        <div className="glass-panel p-4 md:p-6 flex items-center justify-between">
                             <div>
-                                <p className="text-stone-400 text-sm font-bold uppercase tracking-wider mb-1">Stock Health</p>
-                                <h3 className="text-4xl font-black text-blue-500">{stats.lowStock > 0 ? 'Action Needed' : 'Healthy'}</h3>
+                                <p className="text-stone-400 text-xs md:text-sm font-bold uppercase tracking-wider mb-1">Stock Health</p>
+                                <h3 className="text-3xl md:text-4xl font-black text-blue-500">{stats.lowStock > 0 ? 'Action Needed' : 'Healthy'}</h3>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
-                                <Check size={24} />
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
+                                <Check size={20} className="md:w-6 md:h-6" />
                             </div>
                         </div>
                     </div>
                 </div>
             ) : (
                 /* Widget Header */
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4 md:mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-accent">
-                            <Package size={20} />
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-accent">
+                            <Package size={18} className="md:w-5 md:h-5" />
                         </div>
-                        <h2 className="text-2xl font-black tracking-tight text-white">
+                        <h2 className="text-lg md:text-2xl font-black tracking-tight text-white">
                             Pantry Intelligence
                         </h2>
                     </div>
@@ -239,20 +239,20 @@ const StockList = (props) => {
 
             {/* Content: Either Grouped Sections (Full Page) or Flat Grid (Widget) */}
             {!props.limit ? (
-                <div className="space-y-12">
+                <div className="space-y-8 md:space-y-12">
                     {Object.entries(groupedStocks).sort().map(([category, items]) => (
                         <div key={category} className="animate-fade-in-up">
-                            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
-                                <span className={`w-4 h-4 rounded-full ${category === 'vegetable' ? 'bg-emerald-500' :
+                            <h3 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
+                                <span className={`w-3 h-3 md:w-4 md:h-4 rounded-full ${category === 'vegetable' ? 'bg-emerald-500' :
                                     category === 'fruit' ? 'bg-yellow-500' :
                                         category === 'meat' ? 'bg-red-500' :
                                             category === 'grain' ? 'bg-amber-600' : 'bg-accent'
                                     }`}></span>
                                 {capitalize(category)}
-                                <span className="text-sm font-normal text-stone-500 bg-white/5 px-2 py-1 rounded-full ml-2">{items.length}</span>
+                                <span className="text-xs md:text-sm font-normal text-stone-500 bg-white/5 px-2 py-1 rounded-full ml-2">{items.length}</span>
                             </h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                                 {items.map(renderStockCard)}
                             </div>
                         </div>
@@ -266,7 +266,7 @@ const StockList = (props) => {
                 </div>
             ) : (
                 /* Widget Flat Grid */
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                     {stocks.slice(0, props.limit).map(renderStockCard)}
                 </div>
             )}

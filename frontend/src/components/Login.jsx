@@ -75,23 +75,25 @@ const Login = () => {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto' }}>
-            <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
-                <h1 style={{ marginBottom: '2rem' }}>Kitchen Buddy 🍳</h1>
-                <h3 style={{ marginBottom: '1.5rem' }}>{isSignUp ? 'Create Account' : 'Welcome Back'}</h3>
+        <div className="w-full max-w-sm mx-auto mt-12 md:mt-20 px-4">
+            <div className="glass-panel p-6 md:p-10 text-center">
+                <h1 className="text-3xl font-black mb-2 text-white">Kitchen Buddy 🍳</h1>
+                <p className="text-stone-400 mb-8">{isSignUp ? 'Create your account' : 'Welcome back, Chef'}</p>
 
                 {!isSignUp && (
-                    <div style={{ background: 'rgba(255, 255, 0, 0.1)', padding: '10px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        ⚠️ If you just signed up, please <b>check your email</b> to confirm your account before logging in.
+                    <div className="bg-yellow-500/10 p-3 rounded-xl mb-6 text-sm text-yellow-200 border border-yellow-500/20 text-left flex gap-3 items-start">
+                        <span className="text-lg">⚠️</span>
+                        <span>If you just signed up, please <b>check your email</b> to confirm your account before logging in.</span>
                     </div>
                 )}
 
                 {errorMsg && (
-                    <div style={{ background: 'rgba(239, 68, 68, 0.2)', padding: '10px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.9rem', color: '#fca5a5', border: '1px solid #ef4444' }}>
+                    <div className="bg-red-500/20 p-4 rounded-xl mb-6 text-sm text-red-300 border border-red-500/50 text-left">
+                        <p className="mb-2 font-bold flex items-center gap-2"><Lock size={16} /> Error</p>
                         {errorMsg}
                         {needsConfirmation && (
-                            <div style={{ marginTop: '8px' }}>
-                                <button onClick={handleResend} style={{ background: 'var(--accent)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: 'white', cursor: 'pointer', fontSize: '0.8rem' }}>
+                            <div className="mt-2 text-center">
+                                <button onClick={handleResend} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors">
                                     Resend Confirmation Email
                                 </button>
                             </div>
@@ -102,71 +104,53 @@ const Login = () => {
                 <button
                     onClick={handleGoogleLogin}
                     disabled={loading}
-                    style={{
-                        width: '100%',
-                        padding: '12px',
-                        borderRadius: '12px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        background: 'white',
-                        color: '#333',
-                        fontWeight: 'bold',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                        cursor: 'pointer',
-                        marginBottom: '20px',
-                        transition: 'transform 0.2s'
-                    }}
-                    onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'}
-                    onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                    className="w-full p-3 rounded-xl bg-white text-stone-900 font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform mb-6 shadow-lg shadow-white/5"
                 >
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="G" style={{ width: '20px', height: '20px' }} />
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="G" className="w-5 h-5" />
                     Continue with Google
                 </button>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                    <div style={{ h: '1px', flex: 1, background: 'rgba(255,255,255,0.1)' }}></div>
-                    <span>OR</span>
-                    <div style={{ h: '1px', flex: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                <div className="flex items-center gap-4 mb-6 text-stone-500 text-xs font-bold uppercase tracking-widest">
+                    <div className="h-px flex-1 bg-white/10"></div>
+                    <span>Or continue with email</span>
+                    <div className="h-px flex-1 bg-white/10"></div>
                 </div>
 
-                <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ position: 'relative' }}>
-                        <Mail size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-secondary)' }} />
+                <form onSubmit={handleAuth} className="flex flex-col gap-4">
+                    <div className="relative">
+                        <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500" />
                         <input
                             type="email"
-                            className="input-field"
-                            placeholder="Email"
-                            style={{ paddingLeft: '40px' }}
+                            className="input-field pl-12"
+                            placeholder="Email Address"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
-                    <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-secondary)' }} />
+                    <div className="relative">
+                        <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500" />
                         <input
                             type="password"
-                            className="input-field"
+                            className="input-field pl-12"
                             placeholder="Password"
-                            style={{ paddingLeft: '40px' }}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
                     </div>
 
-                    <button type="submit" className="btn-primary" disabled={loading} style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                        {isSignUp ? <><UserPlus size={18} /> Sign Up</> : <><LogIn size={18} /> Sign In</>}
+                    <button type="submit" className="btn-primary w-full justify-center py-4 mt-2" disabled={loading}>
+                        {isSignUp ? <><UserPlus size={20} /> Create Account</> : <><LogIn size={20} /> Sign In</>}
                     </button>
                 </form>
 
-                <p style={{ marginTop: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                <p className="mt-8 text-stone-400 text-sm">
                     {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                     <button
                         onClick={() => setIsSignUp(!isSignUp)}
-                        style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', marginLeft: '5px', fontWeight: 'bold' }}>
+                        className="ml-2 text-accent font-bold hover:underline"
+                    >
                         {isSignUp ? 'Sign In' : 'Sign Up'}
                     </button>
                 </p>

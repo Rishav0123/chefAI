@@ -108,7 +108,7 @@ const ChatAssistant = () => {
     return (
         <div className="flex flex-col h-[calc(100vh-120px)] w-full glass-panel overflow-hidden md:rounded-3xl animate-fade-in shadow-2xl relative">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 bg-stone-900/50 border-b border-white/5 backdrop-blur-md">
+            <div className="flex items-center justify-between p-4 md:p-6 bg-stone-900/50 border-b border-white/5 backdrop-blur-md">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white shadow-lg">
                         <Sparkles size={24} />
@@ -121,7 +121,7 @@ const ChatAssistant = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-stone-950/30">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 bg-stone-950/30">
                 {messages.map((msg, idx) => {
                     let content = msg.content;
                     let suggestion = null;
@@ -138,7 +138,7 @@ const ChatAssistant = () => {
                     return (
                         <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} max-w-[85%] self-${msg.role === 'user' ? 'end' : 'start'}`}>
                             <div className={`
-                                p-5 rounded-2xl text-base leading-relaxed shadow-sm
+                                p-4 md:p-5 rounded-2xl text-sm md:text-base leading-relaxed shadow-sm
                                 ${msg.role === 'user'
                                     ? 'bg-accent text-white rounded-br-none'
                                     : 'bg-stone-800 text-stone-200 rounded-bl-none border border-white/5'}
@@ -212,19 +212,19 @@ const ChatAssistant = () => {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSend} className="p-6 bg-stone-900/80 border-t border-white/5 backdrop-blur-md flex gap-4">
+            <form onSubmit={handleSend} className="p-4 md:p-6 bg-stone-900/80 border-t border-white/5 backdrop-blur-md flex gap-2 md:gap-4">
                 <input
                     type="text"
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     placeholder="Ask for a recipe, ingredient swap, or cooking tip..."
-                    className="flex-1 bg-stone-950 border border-stone-800 rounded-2xl px-6 py-4 text-white placeholder-stone-600 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all text-base"
+                    className="flex-1 bg-stone-950 border border-stone-800 rounded-2xl px-4 py-3 md:px-6 md:py-4 text-white placeholder-stone-600 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all text-sm md:text-base"
                     disabled={loading}
                 />
                 <button
                     type="submit"
                     disabled={loading || !input.trim()}
-                    className="bg-accent text-white rounded-2xl w-16 flex items-center justify-center hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-500/20"
+                    className="bg-accent text-white rounded-2xl w-14 md:w-16 flex items-center justify-center hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-500/20"
                 >
                     <Send size={24} />
                 </button>

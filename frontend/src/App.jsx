@@ -63,14 +63,15 @@ const Dashboard = () => {
     return (
         <div className="animate-fade-in space-y-12">
             {/* Hero Section */}
-            <section className="card-hero text-white group">
+            {/* Hero Section */}
+            <section className="card-hero text-white group relative overflow-hidden">
                 {/* Ambient Background Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10 pointer-events-none"></div>
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-[10s]"></div>
 
-                <div className="relative z-20 container mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+                <div className="relative z-20 container mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 py-8 md:py-12 px-2 md:px-0">
                     <div className="max-w-2xl text-left">
-                        <div className="inline-flex items-center bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-500/20 text-accent text-xs font-bold uppercase tracking-widest mb-6">
+                        <div className="inline-flex items-center bg-orange-500/10 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-orange-500/20 text-accent text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4 md:mb-6">
                             <span className="relative flex h-2 w-2 mr-3">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
@@ -78,24 +79,24 @@ const Dashboard = () => {
                             AI Chef v2.0
                         </div>
 
-                        <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
+                        <h1 className="text-4xl md:text-6xl font-black mb-4 md:mb-6 leading-tight tracking-tight">
                             Elevate Your <br /><span className="text-accent">Culinary Art.</span>
                         </h1>
 
-                        <p className="text-xl text-stone-300 mb-10 font-medium leading-relaxed max-w-lg opacity-90">
+                        <p className="text-base md:text-xl text-stone-300 mb-8 font-medium leading-relaxed max-w-lg opacity-90 hidden md:block">
                             AI-powered inventory tracking and chef-grade recipe generation at your fingertips.
                         </p>
 
                         <div>
-                            <Link to="/chat" className="btn-glass inline-flex items-center gap-3 px-8 py-4 text-lg">
-                                <Sparkles size={24} className="text-accent" />
+                            <Link to="/chat" className="btn-glass inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 text-base md:text-lg w-full md:w-auto justify-center">
+                                <Sparkles size={20} className="text-accent" />
                                 Ask Chef AI
                             </Link>
                         </div>
                     </div>
 
                     {/* Hero Graphic */}
-                    <div className="hidden md:block max-w-[500px] w-full animate-fade-in-up delay-200">
+                    <div className="hidden md:block max-w-[400px] lg:max-w-[500px] w-full animate-fade-in-up delay-200">
                         <img
                             src={HeroGraphic}
                             alt="AI Chef Workflow"
@@ -108,33 +109,35 @@ const Dashboard = () => {
 
 
             {/* Interaction Grid (Inputs & Shopping) */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
                 {/* 1. Visual Scan */}
-                <Link to="/scan" className="glass-panel p-8 flex flex-col items-start justify-center hover:border-accent/50 transition-all group relative overflow-hidden">
+                <Link to="/scan" className="glass-panel p-4 md:p-8 flex flex-col items-center md:items-start justify-center hover:border-accent/50 transition-all group relative overflow-hidden text-center md:text-left">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-all group-hover:bg-accent/10"></div>
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-white transition-all text-accent">
-                        <Camera size={24} />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-accent group-hover:text-white transition-all text-accent">
+                        <Camera size={20} className="md:w-6 md:h-6" />
                     </div>
-                    <h3 className="text-xl font-bold mb-1">Visual Scan</h3>
-                    <p className="text-stone-500 text-sm">Capture bills, items, or meals</p>
+                    <h3 className="text-base md:text-xl font-bold mb-1">Visual Scan</h3>
+                    <p className="text-stone-500 text-xs md:text-sm hidden md:block">Capture bills, items, or meals</p>
                 </Link>
 
                 {/* 2. Manual Entry */}
-                <Link to="/add" className="glass-panel p-8 flex flex-col items-start justify-center hover:border-accent/50 transition-all group">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-white transition-all text-accent">
-                        <PlusCircle size={24} />
+                <Link to="/add" className="glass-panel p-4 md:p-8 flex flex-col items-center md:items-start justify-center hover:border-accent/50 transition-all group text-center md:text-left">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-accent group-hover:text-white transition-all text-accent">
+                        <PlusCircle size={20} className="md:w-6 md:h-6" />
                     </div>
-                    <h3 className="text-xl font-bold mb-1">Manual Entry</h3>
-                    <p className="text-stone-500 text-sm">Log items or meals</p>
+                    <h3 className="text-base md:text-xl font-bold mb-1">Manual Entry</h3>
+                    <p className="text-stone-500 text-xs md:text-sm hidden md:block">Log items or meals</p>
                 </Link>
 
                 {/* 3. Shopping List */}
-                <div className="glass-panel p-8 flex flex-col items-start justify-center hover:bg-white/5 transition-colors cursor-pointer group">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-white transition-all text-stone-400">
-                        <ShoppingBag size={24} />
+                <div className="col-span-2 md:col-span-1 glass-panel p-4 md:p-8 flex flex-row md:flex-col items-center md:items-start justify-center md:justify-center gap-4 md:gap-0 hover:bg-white/5 transition-colors cursor-pointer group">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/5 flex items-center justify-center md:mb-4 group-hover:bg-accent group-hover:text-white transition-all text-stone-400">
+                        <ShoppingBag size={20} className="md:w-6 md:h-6" />
                     </div>
-                    <h3 className="text-xl font-bold mb-1 text-white">Shopping List</h3>
-                    <p className="text-stone-500 text-sm">Automated by AI</p>
+                    <div className="text-left md:text-left flex-1 md:flex-none">
+                        <h3 className="text-base md:text-xl font-bold mb-0.5 md:mb-1 text-white">Shopping List</h3>
+                        <p className="text-stone-500 text-xs md:text-sm">Automated by AI</p>
+                    </div>
                 </div>
             </section>
 

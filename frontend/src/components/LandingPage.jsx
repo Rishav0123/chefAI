@@ -12,7 +12,7 @@ const LandingPage = ({ onGetStarted }) => {
             </div>
 
             {/* Navbar */}
-            <nav className="relative z-50 container mx-auto px-6 py-6 flex justify-between items-center">
+            <nav className="relative z-50 container mx-auto px-4 py-4 md:px-6 md:py-6 flex justify-between items-center">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
                         <ChefHat size={20} color="white" />
@@ -36,14 +36,14 @@ const LandingPage = ({ onGetStarted }) => {
                         <span className="text-xs font-semibold text-stone-300 tracking-wide uppercase">The Future of Home Cooking</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-tight animate-fade-in-up delay-100">
+                    <h1 className="text-4xl md:text-7xl font-black tracking-tight mb-6 md:mb-8 leading-tight animate-fade-in-up delay-100">
                         Elevate Your <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Culinary Art.</span>
                     </h1>
 
-                    <p className="text-xl md:text-2xl text-stone-400 mb-12 leading-relaxed animate-fade-in-up delay-200">
+                    <p className="text-lg md:text-2xl text-stone-400 mb-8 md:mb-12 leading-relaxed animate-fade-in-up delay-200">
                         Stop staring at your fridge. Start creating.
-                        <span className="block mt-2 text-stone-500 text-lg">AI Chef transforms chaos into gourmet meals instantly.</span>
+                        <span className="block mt-2 text-stone-500 text-base md:text-lg">AI Chef transforms chaos into gourmet meals instantly.</span>
                     </p>
 
                     <div className="animate-fade-in-up delay-300 flex flex-col md:flex-row items-center gap-4">
@@ -85,7 +85,7 @@ const LandingPage = ({ onGetStarted }) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Step 1 */}
-                    <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
+                    <div className="glass-panel p-5 md:p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
                         <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">1</div>
                         <div>
                             <h3 className="text-white font-bold text-lg mb-1">Scan & Add</h3>
@@ -123,7 +123,7 @@ const LandingPage = ({ onGetStarted }) => {
             <section className="relative z-10 container mx-auto px-6 py-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Feature 1 */}
-                    <div className="group p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
+                    <div className="group p-6 md:p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
                         <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
                             <Camera size={28} className="text-orange-500" />
                         </div>
