@@ -271,7 +271,7 @@ const StockList = (props) => {
                 </div>
             )}
 
-            {props.limit && stocks.length > props.limit && (
+            {props.limit && stocks.length > 0 && (
                 <div className="flex justify-center mt-8">
                     <Link
                         to="/inventory"

@@ -154,7 +154,7 @@ const MealHistory = (props) => {
                 </div>
             )}
 
-            {props.limit && meals.length > props.limit && (
+            {props.limit && meals.length > 0 && (
                 <div className="flex justify-center mt-8">
                     <Link
                         to="/meals"
