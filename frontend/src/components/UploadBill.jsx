@@ -91,31 +91,37 @@ const UploadBill = ({ mode = 'bill' }) => {
 
                     if (status === 'completed') {
                         clearInterval(pollInterval);
+                        setLoading(false);
 
                         if (isMealMode) {
-                            // Expecting structured meal data
-                            setMealData({
+                            // Redirect to Meal Add Form (Draft Mode)
+                            const draft = {
                                 name: data.name || "Unknown Meal",
-                                ingredients: data.ingredients || [],
-                                nutrition: data.nutrition || { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
-                                meal_type: data.meal_type || 'other'
-                            });
+                                meal_type: data.meal_type || 'other',
+                                deduct_stock: mealSource === 'home', // Default assumptions
+                                nutrition: {
+                                    calories: data.nutrition?.calories || 0,
+                                    protein: data.nutrition?.protein_g || 0,
+                                    carbs: data.nutrition?.carbs_g || 0,
+                                    fat: data.nutrition?.fat_g || 0
+                                },
+                                ingredients: data.ingredients || []
+                            };
+                            // Using same format as Chatbot drafts
+                            navigate('/add?mode=meal', { state: { drafts: [draft] } });
                         } else {
-                            // Expecting { items: [], confidence: ... }
-                            // Handle both new dict format and old list format (just in case)
+                            // Redirect to Stock Add Form (Draft Mode)
+                            // Expecting { items: [...] } or just [...]
                             const items = Array.isArray(data) ? data : (data.items || []);
 
-                            setDetectedItems(items);
+                            const drafts = items.map(item => ({
+                                item_name: item.item_name,
+                                quantity: item.quantity,
+                                category: item.category
+                            }));
 
-                            if (items.length === 0) {
-                                setMessage("AI couldn't find any items. Try a clearer picture?");
-                            } else {
-                                setMessage("Please review the detected details.");
-                            }
+                            navigate('/add?mode=stock', { state: { stockDrafts: drafts } });
                         }
-
-                        setStatus('review');
-                        setLoading(false);
                     } else if (status === 'error') {
                         clearInterval(pollInterval);
                         throw new Error(error || "AI Processing Failed");
@@ -150,294 +156,10 @@ const UploadBill = ({ mode = 'bill' }) => {
         }
     };
 
-    // --- Stock Mode Handlers ---
-    const handleItemChange = (index, field, value) => {
-        const newItems = [...detectedItems];
-        newItems[index][field] = value;
-        setDetectedItems(newItems);
-    };
-
-    const handleDeleteItem = (index) => {
-        const newItems = detectedItems.filter((_, i) => i !== index);
-        setDetectedItems(newItems);
-    };
-
-    const handleConfirmStock = async () => {
-        setLoading(true);
-        try {
-            const itemsPayload = detectedItems.map(item => ({
-                user_id: user.id,
-                item_name: item.item_name,
-                quantity: item.quantity,
-                category: item.category,
-                source: isSingleItem ? "scan" : "bill"
-            }));
-
-            await api.post('/stock/batch', itemsPayload);
-            setStatus('success');
-            setMessage(`Successfully added ${detectedItems.length} items to your stock!`);
-            setTimeout(() => navigate('/'), 2000);
-        } catch (error) {
-            console.error('Batch add failed:', error);
-            setStatus('error');
-            const msg = error.response?.data?.detail || error.message || "Unknown Error";
-            setMessage(`Failed to save items: ${msg}`);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // --- Meal Mode Handlers ---
-    const handleMealChange = (field, value) => {
-        setMealData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleNutritionChange = (field, value) => {
-        setMealData(prev => ({
-            ...prev,
-            nutrition: { ...prev.nutrition, [field]: parseInt(value) || 0 }
-        }));
-    };
-
-    const handleConfirmMeal = async () => {
-        setLoading(true);
-        try {
-            const payload = {
-                user_id: user.id,
-                name: mealData.name,
-                // Only send ingredients if source is home (double safety)
-                ingredients_used: mealSource === 'home' ? mealData.ingredients : [],
-                confidence: 90,
-                meal_type: mealData.meal_type,
-                meal_source: mealSource,
-                calories: mealData.nutrition.calories,
-                protein_g: mealData.nutrition.protein_g,
-                carbs_g: mealData.nutrition.carbs_g,
-                fat_g: mealData.nutrition.fat_g
-            };
-
-            await api.post('/meals/', payload);
-            setStatus('success');
-            setMessage(`Bon Appétit! "${mealData.name}" has been logged.`);
-            setTimeout(() => navigate('/'), 2000); // Or navigate to meal history?
-        } catch (error) {
-            console.error('Meal log failed:', error);
-            setStatus('error');
-            const msg = error.response?.data?.detail || error.message || "Unknown Error";
-            setMessage(`Failed to log meal: ${msg}`);
-        } finally {
-            setLoading(false);
-        }
-    };
 
 
-    if (status === 'review') {
-        return (
-            <div style={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '100px' }}>
-                <h2 style={{ marginBottom: '20px', textAlign: 'center' }}>{isMealMode ? "Review Meal Details" : "Review Items"}</h2>
+    // --- Render Scan UI ---
 
-                {isMealMode ? (
-                    // --- Meal Review UI ---
-                    <div className="space-y-6">
-                        {/* Meal Name & Type */}
-                        <div className="glass-panel p-6 space-y-4">
-                            <div>
-                                <label className="text-sm text-stone-400 mb-1 block">Dish Name</label>
-                                <input
-                                    className="input-field text-lg font-bold"
-                                    value={mealData.name}
-                                    onChange={e => handleMealChange('name', e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm text-stone-400 mb-1 block">Meal Type</label>
-                                <select
-                                    className="input-field"
-                                    value={mealData.meal_type}
-                                    onChange={e => handleMealChange('meal_type', e.target.value)}
-                                >
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            {/* Meal Source Selector */}
-                            <div>
-                                <label className="text-sm text-stone-400 mb-1 block">Source</label>
-                                <select
-                                    className="input-field"
-                                    value={mealSource}
-                                    onChange={e => setMealSource(e.target.value)}
-                                >
-                                    <option value="home">Home Cooked (Deduct Stock)</option>
-                                    <option value="outside">Ordered / Outside (No Deduction)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Nutrition Grid */}
-                        <div className="glass-panel p-6">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 mb-4 flex items-center gap-2">
-                                <Activity size={16} /> Nutrition Estimates
-                            </h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-xs text-stone-400 mb-1 flex items-center gap-1"><Flame size={12} /> Calories</label>
-                                    <input type="number" className="input-field" value={mealData.nutrition.calories} onChange={e => handleNutritionChange('calories', e.target.value)} />
-                                </div>
-                                <div>
-                                    <label className="text-xs text-stone-400 mb-1 flex items-center gap-1"><Utensils size={12} /> Protein (g)</label>
-                                    <input type="number" className="input-field" value={mealData.nutrition.protein_g} onChange={e => handleNutritionChange('protein_g', e.target.value)} />
-                                </div>
-                                <div>
-                                    <label className="text-xs text-stone-400 mb-1 flex items-center gap-1"><Wheat size={12} /> Carbs (g)</label>
-                                    <input type="number" className="input-field" value={mealData.nutrition.carbs_g} onChange={e => handleNutritionChange('carbs_g', e.target.value)} />
-                                </div>
-                                <div>
-                                    <label className="text-xs text-stone-400 mb-1 flex items-center gap-1"><Droplet size={12} /> Fat (g)</label>
-                                    <input type="number" className="input-field" value={mealData.nutrition.fat_g} onChange={e => handleNutritionChange('fat_g', e.target.value)} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Ingredients (Read Only for now, roughly) - Only show for Home Cooked */}
-                        {/* Ingredients - Only displayed for Home Cooked meals where deduction applies */}
-                        {mealSource === 'home' ? (
-                            <div className="glass-panel p-6">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-stone-500 mb-4">Ingredients to Deduct</h3>
-                                <div className="space-y-2">
-                                    {mealData.ingredients.map((ing, idx) => (
-                                        <div key={idx} className="flex justify-between items-center text-sm p-2 bg-white/5 rounded">
-                                            <span className="text-white">{ing.item}</span>
-                                            <span className="text-stone-400">{ing.qty}</span>
-                                        </div>
-                                    ))}
-                                    {mealData.ingredients.length === 0 && <p className="text-stone-500 text-sm">No ingredients extracted.</p>}
-                                </div>
-                            </div>
-                        ) : null}
-                    </div>
-                ) : (
-                    // --- Stock Review UI ---
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        {detectedItems.map((item, idx) => {
-                            // Helper to parse quantity string into num and unit if not already parsed
-                            // We store split values in the item state for editing
-                            if (item.qty_num === undefined) {
-                                let qStr = (item.quantity || "1").toString().toLowerCase();
-                                let num = parseFloat(qStr) || 0;
-                                let unit = 'pcs';
-
-                                if (qStr.includes('kg')) { num *= 1000; unit = 'g'; }
-                                else if (qStr.includes('mg')) { num /= 1000; unit = 'g'; } // minimal support
-                                else if (qStr.includes('g')) { unit = 'g'; }
-                                else if (qStr.includes('l') && !qStr.includes('ml')) { num *= 1000; unit = 'ml'; }
-                                else if (qStr.includes('ml')) { unit = 'ml'; }
-
-                                // Update the item in state immediately to avoid re-parsing
-                                // Note: This is a bit side-effecty inside render, but we need to init the state. 
-                                // Better to do this when setting detectedItems, but for now we handle it via safe defaults in render
-                                // or better, just render separate inputs and update the 'quantity' string on change.
-                                item.qty_num = num;
-                                item.unit = unit;
-                            }
-
-                            const handleQtyChange = (val) => {
-                                const newItems = [...detectedItems];
-                                newItems[idx].qty_num = val;
-                                newItems[idx].quantity = `${val} ${newItems[idx].unit}`; // Update the main field
-                                setDetectedItems(newItems);
-                            };
-
-                            const handleUnitChange = (val) => {
-                                const newItems = [...detectedItems];
-                                newItems[idx].unit = val;
-                                newItems[idx].quantity = `${newItems[idx].qty_num} ${val}`;
-                                setDetectedItems(newItems);
-                            };
-
-                            return (
-                                <div key={idx} className="glass-panel" style={{ padding: '15px', position: 'relative' }}>
-                                    <button
-                                        onClick={() => handleDeleteItem(idx)}
-                                        style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
-                                    >
-                                        ✕
-                                    </button>
-
-                                    <div style={{ display: 'grid', gap: '10px' }}>
-                                        <div>
-                                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Item Name</label>
-                                            <input
-                                                className="input-field"
-                                                value={item.item_name || ''}
-                                                onChange={e => handleItemChange(idx, 'item_name', e.target.value)}
-                                            />
-                                        </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                            <div>
-                                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Quantity</label>
-                                                <div style={{ display: 'flex', gap: '5px' }}>
-                                                    <input
-                                                        type="number"
-                                                        className="input-field"
-                                                        value={item.qty_num}
-                                                        onChange={e => handleQtyChange(e.target.value)}
-                                                    />
-                                                    <select
-                                                        className="input-field"
-                                                        style={{ width: '80px', padding: '0 5px' }}
-                                                        value={item.unit}
-                                                        onChange={e => handleUnitChange(e.target.value)}
-                                                    >
-                                                        <option value="g">g</option>
-                                                        <option value="ml">ml</option>
-                                                        <option value="pcs">pcs</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Category</label>
-                                                <select
-                                                    className="input-field"
-                                                    value={item.category || 'other'}
-                                                    onChange={e => handleItemChange(idx, 'category', e.target.value)}
-                                                >
-                                                    <option value="vegetable">Vegetable</option>
-                                                    <option value="fruit">Fruit</option>
-                                                    <option value="dairy">Dairy</option>
-                                                    <option value="meat">Meat</option>
-                                                    <option value="grain">Grain</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                )}
-
-                <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-                    <button
-                        onClick={() => setStatus(null)}
-                        className="btn-primary"
-                        style={{ background: 'transparent', border: '1px solid var(--text-secondary)', color: 'var(--text-secondary)' }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={isMealMode ? handleConfirmMeal : handleConfirmStock}
-                        className="btn-primary"
-                        disabled={loading}
-                    >
-                        {loading ? 'Saving...' : (isMealMode ? 'Log Meal' : 'Confirm & Add All')}
-                    </button>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative', overflow: 'hidden' }}>
