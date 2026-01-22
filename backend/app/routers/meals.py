@@ -132,3 +132,28 @@ def delete_meal(meal_id: str, db: Session = Depends(get_db)):
     db.delete(meal)
     db.commit()
     return {"message": "Meal deleted successfully"}
+
+@router.put("/{meal_id}")
+def update_meal(meal_id: str, request: MealLogRequest, db: Session = Depends(get_db)):
+    """
+    Update an existing meal log.
+    Does NOT trigger stock re-calculation.
+    """
+    from app.models.meals import Meal
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
+    if not meal:
+        raise HTTPException(status_code=404, detail="Meal not found")
+    
+    # Update fields
+    meal.name = request.name
+    meal.meal_type = request.meal_type
+    meal.meal_source = request.meal_source
+    meal.ingredients_used = request.ingredients_used
+    meal.calories = request.calories
+    meal.protein_g = request.protein_g
+    meal.carbs_g = request.carbs_g
+    meal.fat_g = request.fat_g
+    
+    db.commit()
+    db.refresh(meal)
+    return {"message": "Meal updated successfully", "meal": meal}

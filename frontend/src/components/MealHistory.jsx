@@ -2,9 +2,10 @@ import React, { useEffect, useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../context/UserContext';
 import { Utensils, Clock, Plus, Trash2, Edit2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const MealHistory = (props) => {
+    const navigate = useNavigate();
     const { user, stockRefreshTrigger } = useContext(UserContext); // Refetch when stock refreshes (implies meal logged)
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -107,9 +108,9 @@ const MealHistory = (props) => {
             <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10">
                 {/* Note: Edit isn't fully implemented, linking to same page for now or just visual */}
                 <button
-                    onClick={() => alert("Edit feature coming soon!")}
+                    onClick={() => navigate('/add?mode=meal', { state: { editMeal: meal } })}
                     className="p-1.5 md:p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-white transition-colors cursor-pointer"
-                    title="Edit coming soon"
+                    title="Edit Meal"
                 >
                     <Edit2 size={14} className="md:w-4 md:h-4" />
                 </button>

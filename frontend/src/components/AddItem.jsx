@@ -45,9 +45,27 @@ const AddItem = () => {
     });
     const [mealQueue, setMealQueue] = useState([]);
 
-    // Check for Draft Data from Chatbot
+    // --- Edit Mode State ---
+    const [editingMealId, setEditingMealId] = useState(null);
+
+    // Check for Draft Data or Edit Mode
     useEffect(() => {
-        if (location.state?.drafts) {
+        if (location.state?.editMeal) {
+            const m = location.state.editMeal;
+            setMealFormData({
+                name: m.name,
+                meal_type: m.meal_type || 'other',
+                meal_source: m.source || 'home', // 'source' is the field name in DB/API
+                calories: m.calories || '',
+                protein_g: m.protein_g || '',
+                carbs_g: m.carbs_g || '',
+                fat_g: m.fat_g || '',
+                ingredients_used: m.ingredients_used || []
+            });
+            setEditingMealId(m.id);
+            setActiveTab('meal');
+        } else if (location.state?.drafts) {
+            // ... existing draft logic ...
             const drafts = location.state.drafts;
             console.log("Drafts loaded:", drafts);
 
@@ -80,7 +98,7 @@ const AddItem = () => {
             });
             setActiveTab('meal');
         } else if (location.state?.draft) {
-            // Legacy fallback
+            // ... existing legacy draft logic ...
             const draft = location.state.draft;
             setMealFormData({
                 name: draft.name || '',
@@ -92,25 +110,9 @@ const AddItem = () => {
                 fat_g: draft.nutrition?.fat || '',
                 ingredients_used: draft.ingredients || []
             });
-
-            // If we have ingredients but meal_source is 'out' (maybe explicitly set or defaulted),
-            // we should probably ensure they are visible or at least default to 'home' if ambiguous?
-            // But let's stick to the draft's explicit intent. 
-            // However, Chatbot often infers 'deduct_stock' poorly.
-            // Let's force 'home' if ingredients are provided to ensure they are seen?
-            // "deduct_stock" property from Chatbot is robust usually.
-            // Let's check if the issue is actually property name mismatch in Chatbot output?
-            // Chatbot tool definition: "ingredients": [{"item": "...", "qty": "..."}]
-            // AddItem expects: ingredients_used: [{item: "...", qty: "..."}]
-            // Matches.
-
-            // Maybe the issue is simple: draft.ingredients is undefined?
-            // If I look at the previous `UploadBill.jsx` redirection for meal:
-            // ingredients: data.ingredients || []
-            // That works.
-
             setActiveTab('meal');
         } else if (location.state?.stockDrafts) {
+            // ... existing stock draft logic ...
             const drafts = location.state.stockDrafts;
             console.log("Stock Drafts loaded:", drafts);
 
@@ -146,6 +148,8 @@ const AddItem = () => {
             setActiveTab('stock');
         }
     }, [location.state]);
+
+
 
     // Fetch existing stock for autocomplete
     useEffect(() => {
@@ -281,30 +285,48 @@ const AddItem = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const mealsToSave = [...mealQueue];
-            if (mealFormData.name) mealsToSave.push(mealFormData);
-
-            if (mealsToSave.length === 0) return;
-
-            await Promise.all(mealsToSave.map(meal => {
-                return api.post('/meals/', {
+            if (editingMealId) {
+                // UPDATE Existing Meal
+                await api.put(`/meals/${editingMealId}`, {
                     user_id: user.id,
-                    name: meal.name,
-                    meal_type: meal.meal_type,
-                    meal_source: meal.meal_source,
-                    ingredients_used: meal.ingredients_used || [],
+                    name: mealFormData.name,
+                    meal_type: mealFormData.meal_type,
+                    meal_source: mealFormData.meal_source,
+                    ingredients_used: mealFormData.ingredients_used || [],
                     confidence: 100,
-                    calories: parseInt(meal.calories) || 0,
-                    protein_g: parseInt(meal.protein_g) || 0,
-                    carbs_g: parseInt(meal.carbs_g) || 0,
-                    fat_g: parseInt(meal.fat_g) || 0
+                    calories: parseInt(mealFormData.calories) || 0,
+                    protein_g: parseInt(mealFormData.protein_g) || 0,
+                    carbs_g: parseInt(mealFormData.carbs_g) || 0,
+                    fat_g: parseInt(mealFormData.fat_g) || 0
                 });
-            }));
+                showToast("Meal updated successfully!", 'success');
+            } else {
+                // CREATE New Meal(s)
+                const mealsToSave = [...mealQueue];
+                if (mealFormData.name) mealsToSave.push(mealFormData);
+
+                if (mealsToSave.length === 0) return;
+
+                await Promise.all(mealsToSave.map(meal => {
+                    return api.post('/meals/', {
+                        user_id: user.id,
+                        name: meal.name,
+                        meal_type: meal.meal_type,
+                        meal_source: meal.meal_source,
+                        ingredients_used: meal.ingredients_used || [],
+                        confidence: 100,
+                        calories: parseInt(meal.calories) || 0,
+                        protein_g: parseInt(meal.protein_g) || 0,
+                        carbs_g: parseInt(meal.carbs_g) || 0,
+                        fat_g: parseInt(meal.fat_g) || 0
+                    });
+                }));
+            }
 
             navigate('/');
         } catch (error) {
-            console.error("Error adding meals:", error);
-            showToast("Failed to add meals. Please try again.", 'error');
+            console.error("Error saving/updating meal:", error);
+            showToast("Failed to save meal. Please try again.", 'error');
         } finally {
             setLoading(false);
         }
@@ -631,19 +653,22 @@ const AddItem = () => {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <button
-                                onClick={handleAddAnotherMeal}
-                                type="button"
-                                className="w-full bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-3 rounded-xl font-bold transition-all border border-white/10 uppercase tracking-wider text-sm"
-                            >
-                                + Add Another Meal
-                            </button>
+                            {!editingMealId && (
+                                <button
+                                    onClick={handleAddAnotherMeal}
+                                    type="button"
+                                    className="w-full bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-3 rounded-xl font-bold transition-all border border-white/10 uppercase tracking-wider text-sm"
+                                >
+                                    + Add Another Meal
+                                </button>
+                            )}
                             <button type="submit" className="w-full btn-primary flex justify-center items-center gap-2 py-4">
                                 <Utensils size={18} />
-                                {mealQueue.length > 0
-                                    ? `Log All (${mealQueue.length + (mealFormData.name ? 1 : 0)})`
-                                    : "Log Meal"
-                                }
+                                {editingMealId ? "Update Meal" : (
+                                    mealQueue.length > 0
+                                        ? `Log All (${mealQueue.length + (mealFormData.name ? 1 : 0)})`
+                                        : "Log Meal"
+                                )}
                             </button>
                         </div>
                     </form>
