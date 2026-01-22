@@ -9,7 +9,7 @@ import ChatAssistant from './components/ChatAssistant';
 import Login from './components/Login';
 import ChatWidgetButton from './components/ChatWidgetButton';
 import { UserProvider, UserContext } from './context/UserContext';
-import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles, UploadCloud, Camera, Activity, ChevronDown, Home, Users } from 'lucide-react';
+import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles, UploadCloud, Camera, Activity, ChevronDown, Home, Users, Flame } from 'lucide-react';
 import MealHistory from './components/MealHistory';
 import ProfileModal from './components/ProfileModal';
 import ScanMethod from './components/ScanMethod';
@@ -81,11 +81,11 @@ const Dashboard = () => {
                         </div>
 
                         <h1 className="text-4xl md:text-6xl font-black mb-4 md:mb-6 leading-tight tracking-tight">
-                            Elevate Your <br /><span className="text-accent">Culinary Art.</span>
+                            Cook Smarter, <br /><span className="text-accent">Together.</span>
                         </h1>
 
                         <p className="text-base md:text-xl text-stone-300 mb-8 font-medium leading-relaxed max-w-lg opacity-90 hidden md:block">
-                            AI-powered inventory tracking and chef-grade recipe generation at your fingertips.
+                            Share your pantry with family, track nutrition automatically, and let AI plan your meals.
                         </p>
 
                         <div>
@@ -109,7 +109,25 @@ const Dashboard = () => {
 
 
 
-            {/* Interaction Grid (Inputs & Shopping) */}
+            {/* New Features Highlight Grid */}
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                    { icon: Users, title: "Shared Pantry", desc: "Collaborate with family & roommates." },
+                    { icon: Activity, title: "Nutrition Tracking", desc: "AI-powered macros & calories." },
+                    { icon: Flame, title: "Smart Deductions", desc: "Cooking auto-updates real stock." },
+                    { icon: Camera, title: "Visual Inventory", desc: "Scan receipts & fridge instantly." },
+                ].map((feature, idx) => (
+                    <div key={idx} className="glass-panel p-4 flex flex-col items-center text-center hover:bg-white/5 transition-colors group cursor-default">
+                        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <feature.icon size={20} className="text-accent" />
+                        </div>
+                        <h3 className="font-bold text-white text-sm mb-1">{feature.title}</h3>
+                        <p className="text-stone-500 text-xs leading-relaxed">{feature.desc}</p>
+                    </div>
+                ))}
+            </section>
+
+            {/* Quick Actions (Inputs & Shopping) */}
             <section className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
                 {/* 1. Visual Scan */}
                 <Link to="/scan" className="glass-panel p-4 md:p-8 flex flex-col items-center md:items-start justify-center hover:border-accent/50 transition-all group relative overflow-hidden text-center md:text-left">
