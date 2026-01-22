@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .models import kitchen, base, chat as chat_model
+from .models import kitchen, base, chat as chat_model, meals
 from .db import engine
 from app.routers import stock, upload, users, chat, meals
 from app.migration_utils import check_and_migrate_meals_table

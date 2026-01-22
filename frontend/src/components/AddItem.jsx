@@ -48,6 +48,7 @@ const AddItem = () => {
     // --- Edit Mode State ---
     const [editingMealId, setEditingMealId] = useState(null);
     const [editingStockId, setEditingStockId] = useState(null);
+    const [pendingLeftovers, setPendingLeftovers] = useState(null);
 
     // Check for Draft Data or Edit Mode
     useEffect(() => {
@@ -364,6 +365,24 @@ const AddItem = () => {
                         fat_g: parseInt(meal.fat_g) || 0
                     });
                 }));
+            }
+
+            // --- Check for Leftover Stock Logic ---
+            if (mealFormData.meal_source === 'home' && mealFormData.ingredients_used.length > 0) {
+                const missingIngredients = mealFormData.ingredients_used.filter(ing => {
+                    // Check if item exists in stock (fuzzy name match)
+                    // ing.item "Rice" vs stock ["rice", "Basmati Rice"]
+                    return !existingStockNames.some(stockName =>
+                        stockName.toLowerCase().includes(ing.item.toLowerCase()) ||
+                        ing.item.toLowerCase().includes(stockName.toLowerCase())
+                    );
+                });
+
+                if (missingIngredients.length > 0) {
+                    setPendingLeftovers(missingIngredients);
+                    setLoading(false); // Stop loading, wait for user input
+                    return; // Do NOT navigate yet
+                }
             }
 
             navigate('/');
@@ -727,6 +746,63 @@ const AddItem = () => {
                 `}>
                     {toast.type === 'error' ? <X size={20} /> : <Sparkles size={20} />}
                     {toast.message}
+                </div>
+            )}
+
+            {/* Leftover Prompt Modal */}
+            {pendingLeftovers && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                    background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 4000
+                }}>
+                    <div className="glass-panel p-6 w-[90%] max-w-sm text-center border border-accent/20">
+                        <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4 text-accent animate-pulse">
+                            <Box size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Pantry Check</h3>
+                        <p className="text-stone-400 text-sm mb-6">
+                            Assuming stock from previously homecooked meal is still left, shall I go forward adding the stock to pantry?
+                            <br /><span className="text-xs text-stone-500 mt-2 block">({pendingLeftovers.length} new items detected)</span>
+                        </p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setPendingLeftovers(null);
+                                    navigate('/');
+                                }}
+                                className="flex-1 py-3 text-stone-400 hover:text-white font-bold transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Navigate to Stock Add with 2x Quantity drafts
+                                    const stockDrafts = pendingLeftovers.map(ing => {
+                                        let qty = parseFloat(ing.qty) || 0;
+                                        // Attempt to extract unit
+                                        const unitMatch = ing.qty ? ing.qty.match(/[a-zA-Z]+/) : null;
+                                        const unit = unitMatch ? unitMatch[0] : '';
+
+                                        // Heuristic: 2x quantity
+                                        const newQty = qty * 2;
+                                        const quantityStr = unit ? `${newQty}${unit}` : `${newQty}`;
+
+                                        return {
+                                            item_name: ing.item,
+                                            quantity: quantityStr,
+                                            category: 'other' // Default, user can change
+                                        };
+                                    });
+
+                                    navigate('/add?mode=stock', { state: { stockDrafts: stockDrafts } });
+                                }}
+                                className="flex-1 btn-primary justify-center font-bold"
+                            >
+                                Yes
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

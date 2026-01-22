@@ -94,7 +94,11 @@ def add_items_batch(items: List[StockCreate], db: Session = Depends(get_db)):
 
 @router.get("/{user_id}", response_model=List[StockResponse])
 def get_stock(user_id: str, db: Session = Depends(get_db)):
-    return db.query(KitchenStock).filter(KitchenStock.user_id == user_id).all()
+    try:
+        return db.query(KitchenStock).filter(KitchenStock.user_id == user_id).all()
+    except Exception as e:
+        print(f"ERROR GETTING STOCK: {e}")
+        raise HTTPException(status_code=500, detail=f"Stock Error: {str(e)}")
 
 @router.delete("/{stock_id}")
 def delete_item(stock_id: str, db: Session = Depends(get_db)):

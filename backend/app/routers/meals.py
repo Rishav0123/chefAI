@@ -114,9 +114,15 @@ def get_meal_history(user_id: str, db: Session = Depends(get_db)):
     """
     Get the last 20 meals logged by the user.
     """
-    from app.models.meals import Meal
-    meals = db.query(Meal).filter(Meal.user_id == user_id).order_by(Meal.created_at.desc()).limit(20).all()
-    return meals
+    try:
+        from app.models.meals import Meal
+        meals = db.query(Meal).filter(Meal.user_id == user_id).order_by(Meal.created_at.desc()).limit(20).all()
+        return meals
+    except Exception as e:
+        print(f"ERROR GETTING MEALS: {e}")
+        # Return empty list or specific error to client to debug
+        # We raise HTTPException so the frontend gets a JSON response instead of partial crash
+        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
 
 @router.delete("/{meal_id}")
 def delete_meal(meal_id: str, db: Session = Depends(get_db)):
