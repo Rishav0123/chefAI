@@ -207,7 +207,7 @@ import LandingPage from './components/LandingPage';
 
 // Main App Structure with Auth Logic
 const AppContent = () => {
-    const { user, loading, kitchens, activeKitchen, switchKitchen } = React.useContext(UserContext);
+    const { user, loading, logout, kitchens, activeKitchen, switchKitchen } = React.useContext(UserContext);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [isKitchenMenuOpen, setIsKitchenMenuOpen] = useState(false);

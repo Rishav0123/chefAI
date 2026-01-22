@@ -8,7 +8,7 @@ import LoadingOverlay from './LoadingOverlay';
 const AddItem = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useContext(UserContext);
+    const { user, activeKitchen, triggerStockRefresh } = useContext(UserContext);
 
     // Initialize tab based on URL param ?mode=meal or default to 'stock'
     const initialTab = new URLSearchParams(location.search).get('mode') || 'stock';
@@ -253,6 +253,7 @@ const AddItem = () => {
                     const quantity = `${item.quantity_num} ${item.unit}`;
                     return api.post('/stock/', {
                         user_id: user.id,
+                        kitchen_id: activeKitchen?.id, // Link to active workspace
                         item_name: item.item_name,
                         quantity: quantity,
                         category: item.category,

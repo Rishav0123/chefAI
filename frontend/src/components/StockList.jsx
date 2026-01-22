@@ -6,25 +6,31 @@ import { Package, Calendar, Tag, Trash2, Edit2, X, Check, UploadCloud, Camera, S
 
 const StockList = (props) => {
     const navigate = useNavigate();
-    const { user, stockRefreshTrigger } = useContext(UserContext);
+    const { user, stockRefreshTrigger, activeKitchen } = useContext(UserContext);
     const [stocks, setStocks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        if (user?.id) fetchStock();
+        if (activeKitchen?.id) fetchStock();
+        else if (user?.id && !activeKitchen) {
+            // Fallback if no kitchen selected yet (shouldn't happen with updated context)
+            // fetchStock(user.id); 
+        }
 
         const onFocus = () => {
-            if (user?.id) fetchStock();
+            if (activeKitchen?.id) fetchStock();
         };
 
         window.addEventListener('focus', onFocus);
         return () => window.removeEventListener('focus', onFocus);
-    }, [user?.id, stockRefreshTrigger]);
+    }, [activeKitchen?.id, user?.id, stockRefreshTrigger]);
 
     const fetchStock = async () => {
         try {
-            const response = await api.get(`/stock/${user.id}`);
+            // Use activeKitchen.id if available, otherwise fallback to user (for legacy support during switch)
+            const targetId = activeKitchen?.id || user.id;
+            const response = await api.get(`/stock/${targetId}`);
             setStocks(response.data);
         } catch (error) {
             console.error("Error fetching stock:", error);
