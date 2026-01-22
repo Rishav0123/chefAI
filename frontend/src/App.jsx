@@ -145,18 +145,30 @@ const Dashboard = () => {
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Kitchen Capacity Widget */}
                 {/* Kitchen Capacity & Metrics Widget */}
-                <div className="glass-panel p-6 flex flex-col justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-accent/5 rounded-full blur-[60px] -mr-16 -mt-16 transition-all group-hover:bg-accent/10"></div>
+                <div className="flex flex-col gap-6">
+                    {/* Recommended Meal Placeholder */}
+                    <div className="glass-panel p-6 relative overflow-hidden group flex-1 flex flex-col justify-center items-center text-center min-h-[160px]">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-all group-hover:bg-green-500/10"></div>
 
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-stone-400 text-sm font-bold uppercase tracking-widest">Pantry Status</h3>
-                        <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
-                            <Activity size={16} className="text-stone-400" />
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                            <ChefHat size={24} className="text-stone-500" />
                         </div>
+                        <h3 className="text-stone-300 font-bold mb-1">Recommended Meal</h3>
+                        <p className="text-accent text-sm font-medium animate-pulse">Coming Soon</p>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6">
-                        {/* 1. Capacity */}
+                    {/* Kitchen Capacity Widget */}
+                    <div className="glass-panel p-6 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-all group-hover:bg-accent/10"></div>
+
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-stone-400 text-sm font-bold uppercase tracking-widest">Pantry Status</h3>
+                            <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
+                                <Activity size={16} className="text-stone-400" />
+                            </div>
+                        </div>
+
+                        {/* 1. Capacity Only */}
                         <div>
                             <div className="flex justify-between items-end mb-2">
                                 <span className="font-bold text-white">Capacity</span>
@@ -165,30 +177,6 @@ const Dashboard = () => {
                             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                                 <div className="h-full bg-accent rounded-full" style={{ width: `${efficiency}%` }}></div>
                             </div>
-                        </div>
-
-                        {/* 2. Freshness */}
-                        <div>
-                            <div className="flex justify-between items-end mb-2">
-                                <span className="font-bold text-white">Freshness</span>
-                                <span className="text-green-500 font-black">{freshness}%</span>
-                            </div>
-                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full bg-green-500 rounded-full" style={{ width: `${freshness}%` }}></div>
-                            </div>
-                            <p className="text-xs text-stone-500 mt-1">Items safe from expiry</p>
-                        </div>
-
-                        {/* 3. Variety */}
-                        <div>
-                            <div className="flex justify-between items-end mb-2">
-                                <span className="font-bold text-white">Variety</span>
-                                <span className="text-blue-500 font-black">{varietyScore}%</span>
-                            </div>
-                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${varietyScore}%` }}></div>
-                            </div>
-                            <p className="text-xs text-stone-500 mt-1">Diversity of ingredients</p>
                         </div>
                     </div>
                 </div>
