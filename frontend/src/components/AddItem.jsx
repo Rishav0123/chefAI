@@ -724,7 +724,16 @@ const AddItem = () => {
                                     className="p-5 rounded-2xl bg-stone-800 border border-orange-500/30 shadow-lg relative animate-fade-in group cursor-pointer hover:bg-stone-700 transition-colors"
                                     onClick={() => {
                                         // Load back into form
-                                        setMealFormData(m);
+                                        setMealFormData({
+                                            name: m.name,
+                                            meal_type: m.meal_type || 'other',
+                                            meal_source: (m.meal_source === 'out' || m.meal_source === 'outside') ? 'outside' : 'home',
+                                            ingredients_used: m.ingredients_used || [],
+                                            calories: m.calories || '',
+                                            protein_g: m.protein_g || '',
+                                            carbs_g: m.carbs_g || '',
+                                            fat_g: m.fat_g || ''
+                                        });
                                         // Remove from queue
                                         const newQueue = [...mealQueue];
                                         newQueue.splice(i, 1);
