@@ -575,7 +575,22 @@ const AddItem = () => {
                                         >
                                             <div className="w-1.5 h-1.5 rounded-full bg-accent group-hover:scale-125 transition-transform"></div>
                                             <span className="flex-1">{item.item_name} <span className="text-stone-500">({item.quantity_num} {item.unit})</span></span>
-                                            <span className="text-xs text-stone-500 opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
+                                            <span className="text-xs text-stone-500 opacity-0 group-hover:opacity-100 transition-opacity mr-2">Edit</span>
+
+                                            {/* Delete Button */}
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const newQueue = [...stockQueue];
+                                                    newQueue.splice(i, 1);
+                                                    setStockQueue(newQueue);
+                                                }}
+                                                className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all"
+                                                title="Remove from queue"
+                                            >
+                                                <X size={14} />
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>
