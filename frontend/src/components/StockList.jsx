@@ -2,14 +2,14 @@ import React, { useEffect, useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package, Calendar, Tag, Trash2, Edit2, X, Check, UploadCloud, Camera } from 'lucide-react';
+import { Package, Calendar, Tag, Trash2, Edit2, X, Check, UploadCloud, Camera, Search } from 'lucide-react';
 
 const StockList = (props) => {
     const navigate = useNavigate();
     const { user, stockRefreshTrigger } = useContext(UserContext);
     const [stocks, setStocks] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [editingItem, setEditingItem] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (user?.id) fetchStock();
@@ -123,12 +123,20 @@ const StockList = (props) => {
         </div>
     );
 
+    // --- Filtering Logic ---
+    const filteredStocks = stocks.filter(item => {
+        if (!searchTerm) return true;
+        const q = searchTerm.toLowerCase();
+        return (
+            item.item_name.toLowerCase().includes(q) ||
+            item.category.toLowerCase().includes(q)
+        );
+    });
+
     // --- Stats & Grouping Logic (Only for Full Page) ---
     const stats = !props.limit ? {
         total: stocks.length,
         lowStock: stocks.filter(i => {
-            // Simple heuristic: if quantity contains "1" (like "1 kg" or "1 unit") it might be low, 
-            // but specific "low" logic depends on usage. For now, count items without specific quantity or "0".
             return !i.quantity || i.quantity === '0' || parseInt(i.quantity) <= 1
         }).length,
         expiringSoon: stocks.filter(item => {
@@ -143,7 +151,7 @@ const StockList = (props) => {
     } : null;
 
     // Group items by category for the full view
-    const groupedStocks = !props.limit ? stocks.reduce((acc, item) => {
+    const groupedStocks = !props.limit ? filteredStocks.reduce((acc, item) => {
         const cat = item.category || 'Other';
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(item);
@@ -166,6 +174,18 @@ const StockList = (props) => {
                         <Link to="/add" className="btn-primary flex items-center gap-2 text-sm md:text-base px-4 py-2">
                             <Package size={18} className="md:w-5 md:h-5" /> <span className="hidden md:inline">Add New Item</span><span className="md:hidden">Add</span>
                         </Link>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative mb-6">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search pantry..."
+                            className="w-full bg-stone-900/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-accent transition-colors"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
 
                     {/* Stats Cards */}

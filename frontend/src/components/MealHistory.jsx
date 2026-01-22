@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../context/UserContext';
-import { Utensils, Clock, Plus, Trash2, Edit2 } from 'lucide-react';
+import { Utensils, Clock, Plus, Trash2, Edit2, Search } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const MealHistory = (props) => {
@@ -9,6 +9,7 @@ const MealHistory = (props) => {
     const { user, stockRefreshTrigger } = useContext(UserContext); // Refetch when stock refreshes (implies meal logged)
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (user?.id) fetchHistory();
@@ -83,16 +84,27 @@ const MealHistory = (props) => {
     }
 
     // logic to show only first N items if limit prop is present
-    const displayedMeals = props.limit ? meals.slice(0, props.limit) : meals;
+    const filteredMeals = meals.filter(meal => {
+        if (!searchTerm) return true;
+        return meal.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    // We apply limit AFTER filtering if desired, or maybe filtering only applies to full view.
+    // Usually search is useful in full view. If limit is present (Dashboard), we might search within limited or all?
+    // Let's assume search filters ALL meals then slices if limit exists (though usually widgets don't have search).
+    // Actually, user kept simple: "search bar functionality... to search inventory and meal".
+    // I'll apply search to the source list.
+
+    const displayedMeals = props.limit ? filteredMeals.slice(0, props.limit) : filteredMeals;
 
     // --- Stats & Grouping Logic ---
     const stats = !props.limit ? {
-        totalMeals: meals.length,
-        totalCalories: meals.reduce((sum, m) => sum + (m.calories || 0), 0),
-        avgProtein: Math.round(meals.reduce((sum, m) => sum + (m.protein_g || 0), 0) / (meals.length || 1))
+        totalMeals: filteredMeals.length,
+        totalCalories: filteredMeals.reduce((sum, m) => sum + (m.calories || 0), 0),
+        avgProtein: Math.round(filteredMeals.reduce((sum, m) => sum + (m.protein_g || 0), 0) / (filteredMeals.length || 1))
     } : null;
 
-    const groupedMeals = !props.limit ? meals.reduce((acc, meal) => {
+    const groupedMeals = !props.limit ? filteredMeals.reduce((acc, meal) => {
         const dateStr = meal.created_at
             ? new Date(meal.created_at).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
             : 'Unknown Date';
@@ -171,6 +183,18 @@ const MealHistory = (props) => {
                             <Plus size={18} />
                             Add New Meal
                         </Link>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative mb-6">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search meals..."
+                            className="w-full bg-stone-900/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-accent transition-colors"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
