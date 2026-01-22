@@ -208,6 +208,26 @@ const AddItem = () => {
 
     const handleStockSubmit = async (e) => {
         e.preventDefault();
+
+        // Manual Validation
+        const hasCurrentItem = !!stockFormData.item_name;
+
+        if (editingStockId) {
+            if (!hasCurrentItem) {
+                showToast("Item name is required", 'error');
+                return;
+            }
+        } else {
+            if (!hasCurrentItem && stockQueue.length === 0) {
+                showToast("Please add an item or add to queue", 'error');
+                return;
+            }
+            if (hasCurrentItem && !stockFormData.quantity_num) {
+                showToast("Please enter a quantity", 'error');
+                return;
+            }
+        }
+
         setLoading(true);
         try {
             if (editingStockId) {
@@ -224,7 +244,7 @@ const AddItem = () => {
             } else {
                 // CREATE New Stock
                 const itemsToSave = [...stockQueue];
-                if (stockFormData.item_name) itemsToSave.push(stockFormData);
+                if (hasCurrentItem) itemsToSave.push(stockFormData);
 
                 if (itemsToSave.length === 0) return;
 
@@ -327,6 +347,22 @@ const AddItem = () => {
 
     const handleMealSubmit = async (e) => {
         e.preventDefault();
+
+        // Manual Validation
+        const hasCurrentMeal = !!mealFormData.name;
+
+        if (editingMealId) {
+            if (!hasCurrentMeal) {
+                showToast("Meal name is required", 'error');
+                return;
+            }
+        } else {
+            if (!hasCurrentMeal && mealQueue.length === 0) {
+                showToast("Please enter a meal details or add to queue", 'error');
+                return;
+            }
+        }
+
         setLoading(true);
         try {
             if (editingMealId) {
@@ -347,7 +383,7 @@ const AddItem = () => {
             } else {
                 // CREATE New Meal(s)
                 const mealsToSave = [...mealQueue];
-                if (mealFormData.name) mealsToSave.push(mealFormData);
+                if (hasCurrentMeal) mealsToSave.push(mealFormData);
 
                 if (mealsToSave.length === 0) return;
 
@@ -368,10 +404,13 @@ const AddItem = () => {
             }
 
             // --- Check for Leftover Stock Logic ---
-            if (mealFormData.meal_source === 'home' && mealFormData.ingredients_used.length > 0) {
+            // Only check if we are saving the current form meal specifically, or if queue has items?
+            // The prompt logic handles "mealFormData" which is the *current* form. 
+            // The logic implies we only check leftovers for the *current* meal being entered or perhaps the last one?
+            // Existing logic checked `mealFormData`. If we skip submitting `mealFormData` because it's empty, we shouldn't check it.
+
+            if (hasCurrentMeal && mealFormData.meal_source === 'home' && mealFormData.ingredients_used.length > 0) {
                 const missingIngredients = mealFormData.ingredients_used.filter(ing => {
-                    // Check if item exists in stock (fuzzy name match)
-                    // ing.item "Rice" vs stock ["rice", "Basmati Rice"]
                     return !existingStockNames.some(stockName =>
                         stockName.toLowerCase().includes(ing.item.toLowerCase()) ||
                         ing.item.toLowerCase().includes(stockName.toLowerCase())
@@ -380,10 +419,12 @@ const AddItem = () => {
 
                 if (missingIngredients.length > 0) {
                     setPendingLeftovers(missingIngredients);
-                    setLoading(false); // Stop loading, wait for user input
+                    setLoading(false);
                     return; // Do NOT navigate yet
                 }
             }
+            // Note: If saving from queue only, we skip the leftover check for simplicity or we'd need to iterate all.
+            // For now, retaining behavior for `mealFormData` only.
 
             navigate('/');
         } catch (error) {
@@ -428,7 +469,6 @@ const AddItem = () => {
                                 value={stockFormData.item_name}
                                 onChange={handleStockChange}
                                 list="stock-options"
-                                required
                             />
                             <datalist id="stock-options">
                                 {existingStockNames.map((name, i) => (
@@ -447,7 +487,6 @@ const AddItem = () => {
                                     placeholder="e.g. 500"
                                     value={stockFormData.quantity_num}
                                     onChange={handleStockChange}
-                                    required
                                 />
                             </div>
                             <div>
@@ -548,7 +587,6 @@ const AddItem = () => {
                                 placeholder="e.g. Chicken Curry"
                                 value={mealFormData.name}
                                 onChange={handleMealChange}
-                                required
                             />
                         </div>
 
