@@ -182,9 +182,9 @@ const AddItem = () => {
 
 
 
-    // Fetch existing stock for autocomplete
+    // Fetch existing stock for autocomplete (and validation)
     useEffect(() => {
-        if (user && activeTab === 'stock') {
+        if (user) {
             const targetId = activeKitchen?.id || user.id;
             api.get(`/stock/${targetId}`)
                 .then(res => {
@@ -193,7 +193,7 @@ const AddItem = () => {
                 })
                 .catch(err => console.error("Failed to fetch stock for autocomplete", err));
         }
-    }, [user, activeTab]);
+    }, [user, activeKitchen, activeTab]);
 
     // --- Stock Handlers ---
     const handleStockChange = (e) => {
