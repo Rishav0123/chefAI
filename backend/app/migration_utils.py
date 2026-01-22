@@ -20,7 +20,9 @@ def check_and_migrate_meals_table(engine: Engine):
             "protein_g": "INTEGER",
             "carbs_g": "INTEGER",
             "fat_g": "INTEGER",
-            "meal_type": "VARCHAR" 
+            "meal_type": "VARCHAR",
+            "kitchen_id": "VARCHAR",
+            "source": "VARCHAR" # Ensure source is also there just in case 
         }
         
         with engine.connect() as conn:
