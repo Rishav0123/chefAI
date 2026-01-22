@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChefHat, Camera, MessageSquare, Activity, ArrowRight, Sparkles } from 'lucide-react';
+import { ChefHat, Camera, MessageSquare, Activity, ArrowRight, Sparkles, Users, Flame } from 'lucide-react';
 import HeroGraphic from '../assets/how_it_works_graphic.png';
 
 const LandingPage = ({ onGetStarted }) => {
@@ -37,13 +37,13 @@ const LandingPage = ({ onGetStarted }) => {
                     </div>
 
                     <h1 className="text-4xl md:text-7xl font-black tracking-tight mb-6 md:mb-8 leading-tight animate-fade-in-up delay-100">
-                        Elevate Your <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Culinary Art.</span>
+                        Cook Smarter, <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Together.</span>
                     </h1>
 
                     <p className="text-lg md:text-2xl text-stone-400 mb-8 md:mb-12 leading-relaxed animate-fade-in-up delay-200">
-                        Stop staring at your fridge. Start creating.
-                        <span className="block mt-2 text-stone-500 text-base md:text-lg">AI Chef transforms chaos into gourmet meals instantly.</span>
+                        Share your pantry with family, roommates, or partners.
+                        <span className="block mt-2 text-stone-500 text-base md:text-lg">AI Chef tracks your shared stock, nutrition, and shopping lists automatically.</span>
                     </p>
 
                     <div className="animate-fade-in-up delay-300 flex flex-col md:flex-row items-center gap-4">
@@ -88,9 +88,9 @@ const LandingPage = ({ onGetStarted }) => {
                     <div className="glass-panel p-5 md:p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
                         <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">1</div>
                         <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Scan & Add</h3>
+                            <h3 className="text-white font-bold text-lg mb-1">Create Workspace</h3>
                             <p className="text-stone-400 text-sm leading-relaxed">
-                                Upload a bill or photo of your kitchen. AI detects ingredients instantly.
+                                Start a "Home Kitchen" or "Office Pantry" and share the unique invite code.
                             </p>
                         </div>
                     </div>
@@ -99,9 +99,9 @@ const LandingPage = ({ onGetStarted }) => {
                     <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
                         <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">2</div>
                         <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Ask Chef AI</h3>
+                            <h3 className="text-white font-bold text-lg mb-1">Scan & Stock</h3>
                             <p className="text-stone-400 text-sm leading-relaxed">
-                                "What can I cook?" The AI suggests personalized recipes based on your stock.
+                                Snap a photo of your fridge or grocery bill. AI instantly updates the shared inventory.
                             </p>
                         </div>
                     </div>
@@ -110,9 +110,9 @@ const LandingPage = ({ onGetStarted }) => {
                     <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
                         <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">3</div>
                         <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Cook & Track</h3>
+                            <h3 className="text-white font-bold text-lg mb-1">Cook & Deduct</h3>
                             <p className="text-stone-400 text-sm leading-relaxed">
-                                Follow real-time recipes and auto-deduct used ingredients from your pantry.
+                                Log your meal with one click. AI deducts ingredients from the shared stock automatically.
                             </p>
                         </div>
                     </div>
@@ -121,40 +121,48 @@ const LandingPage = ({ onGetStarted }) => {
 
             {/* Features Section */}
             <section className="relative z-10 container mx-auto px-6 py-20">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Feature 1 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    {/* Feature 1: Shared Workspace */}
                     <div className="group p-6 md:p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
                         <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
-                            <Camera size={28} className="text-orange-500" />
+                            <Users size={28} className="text-orange-500" />
                         </div>
-                        <h3 className="text-2xl font-bold mb-4">Visual Inventory</h3>
+                        <h3 className="text-2xl font-bold mb-4">Shared Pantry</h3>
                         <p className="text-stone-400 leading-relaxed">
-                            Forget manual typing. Just snap a photo of your receipt or open fridge.
-                            AI instantly identifies ingredients and updates your digital pantry.
+                            Create a digital kitchen for your home or office. Invite members via code and track shared inventory in real-time.
                         </p>
                     </div>
 
-                    {/* Feature 2 */}
+                    {/* Feature 2: Visual Inventory */}
+                    <div className="group p-6 md:p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
+                        <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
+                            <Camera size={28} className="text-purple-500" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-4">Visual Inventory</h3>
+                        <p className="text-stone-400 leading-relaxed">
+                            Forget typing. Just snap a photo of your receipt or fridge. AI instantly identifies ingredients and updates stock.
+                        </p>
+                    </div>
+
+                    {/* Feature 3: Intelligent Chat */}
                     <div className="group p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
                         <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
                             <MessageSquare size={28} className="text-blue-500" />
                         </div>
-                        <h3 className="text-2xl font-bold mb-4">Intelligent Chat</h3>
+                        <h3 className="text-2xl font-bold mb-4">Chef AI Chat</h3>
                         <p className="text-stone-400 leading-relaxed">
-                            "I have chicken and rice. What can I make in 20 mins?"
-                            The AI suggests recipes specifically based on what you actually have in stock.
+                            "I have chicken and rice. What can I make in 20 mins?" The AI suggests personalized recipes based on your stock.
                         </p>
                     </div>
 
-                    {/* Feature 3 */}
+                    {/* Feature 4: Smart Deductions */}
                     <div className="group p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
                         <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
-                            <Activity size={28} className="text-green-500" />
+                            <Flame size={28} className="text-red-500" />
                         </div>
                         <h3 className="text-2xl font-bold mb-4">Smart Tracking</h3>
                         <p className="text-stone-400 leading-relaxed">
-                            Cooking a recipe? One click deducts ingredients from your stock.
-                            Track your "Kitchen Efficiency" and drastically reduce food waste.
+                            Cooking a recipe? One click deducts ingredients from your shared stock. Tracks nutrition and usage automatically.
                         </p>
                     </div>
                 </div>
