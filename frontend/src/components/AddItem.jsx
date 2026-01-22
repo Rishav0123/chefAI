@@ -586,7 +586,7 @@ const AddItem = () => {
                                                     newQueue.splice(i, 1);
                                                     setStockQueue(newQueue);
                                                 }}
-                                                className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all"
+                                                className="bg-red-500 text-white rounded-md p-1.5 hover:bg-red-600 transition-all ml-2 shadow-sm"
                                                 title="Remove from queue"
                                             >
                                                 <X size={14} />
