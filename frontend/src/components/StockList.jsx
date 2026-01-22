@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../context/UserContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Package, Calendar, Tag, Trash2, Edit2, X, Check, UploadCloud, Camera } from 'lucide-react';
 
 const StockList = (props) => {
+    const navigate = useNavigate();
     const { user, stockRefreshTrigger } = useContext(UserContext);
     const [stocks, setStocks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -43,18 +44,7 @@ const StockList = (props) => {
     };
 
     const handleEditClick = (item) => {
-        setEditingItem({ ...item });
-    };
-
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await api.put(`/stock/${editingItem.stock_id}`, editingItem);
-            setStocks(stocks.map(item => item.stock_id === editingItem.stock_id ? res.data : item));
-            setEditingItem(null);
-        } catch (error) {
-            alert("Failed to update item");
-        }
+        navigate('/add?mode=stock', { state: { editStock: item } });
     };
 
     if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Loading kitchen assets...</div>;
@@ -272,56 +262,7 @@ const StockList = (props) => {
                 </div>
             )}
 
-            {editingItem && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    background: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
-                }}>
-                    <div className="glass-panel" style={{ padding: '2rem', width: '90%', maxWidth: '400px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <h3>Edit Item</h3>
-                            <button onClick={() => setEditingItem(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}><X size={24} /></button>
-                        </div>
-                        <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>Item Name</label>
-                                <input
-                                    className="input-field"
-                                    value={editingItem.item_name}
-                                    onChange={e => setEditingItem({ ...editingItem, item_name: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>Quantity</label>
-                                <input
-                                    className="input-field"
-                                    value={editingItem.quantity || ''}
-                                    onChange={e => setEditingItem({ ...editingItem, quantity: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>Category</label>
-                                <select
-                                    className="input-field"
-                                    value={editingItem.category || ''}
-                                    onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
-                                >
-                                    <option value="vegetable">Vegetable</option>
-                                    <option value="fruit">Fruit</option>
-                                    <option value="dairy">Dairy</option>
-                                    <option value="meat">Meat</option>
-                                    <option value="grain">Grain</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <button type="submit" className="btn-primary" style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                                <Check size={18} /> Save Changes
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 };

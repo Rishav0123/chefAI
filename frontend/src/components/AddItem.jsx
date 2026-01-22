@@ -47,6 +47,7 @@ const AddItem = () => {
 
     // --- Edit Mode State ---
     const [editingMealId, setEditingMealId] = useState(null);
+    const [editingStockId, setEditingStockId] = useState(null);
 
     // Check for Draft Data or Edit Mode
     useEffect(() => {
@@ -111,6 +112,35 @@ const AddItem = () => {
                 ingredients_used: draft.ingredients || []
             });
             setActiveTab('meal');
+        } else if (location.state?.editStock) {
+            const s = location.state.editStock;
+
+            // Parse "500 g" or "500g"
+            let num = '';
+            let unit = 'pcs';
+            if (s.quantity) {
+                const match = s.quantity.match(/^([\d\.]+)\s*([a-zA-Z]*)$/);
+                if (match) {
+                    num = match[1];
+                    unit = match[2].toLowerCase() || 'pcs';
+                } else {
+                    num = parseFloat(s.quantity) || ''; // Fallback
+                }
+            }
+
+            // Normalize unit
+            if (unit === 'kg') { num = (parseFloat(num) || 0) * 1000; unit = 'g'; }
+            else if (unit === 'l') { num = (parseFloat(num) || 0) * 1000; unit = 'ml'; }
+
+            setStockFormData({
+                item_name: s.item_name,
+                quantity_num: num,
+                unit: ['g', 'ml', 'pcs'].includes(unit) ? unit : 'pcs', // Default to pcs if unknown
+                category: s.category || '',
+                expiry_date: s.expiry_date || ''
+            });
+            setEditingStockId(s.stock_id);
+            setActiveTab('stock');
         } else if (location.state?.stockDrafts) {
             // ... existing stock draft logic ...
             const drafts = location.state.stockDrafts;
@@ -179,27 +209,40 @@ const AddItem = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            // Combine queue + current (if filled)
-            const itemsToSave = [...stockQueue];
-            if (stockFormData.item_name) itemsToSave.push(stockFormData);
-
-            if (itemsToSave.length === 0) return;
-
-            // Save all in parallel
-            await Promise.all(itemsToSave.map(item => {
-                const quantity = `${item.quantity_num} ${item.unit}`;
-                return api.post('/stock/', {
+            if (editingStockId) {
+                // UPDATE Existing Stock
+                const quantity = `${stockFormData.quantity_num} ${stockFormData.unit}`;
+                await api.put(`/stock/${editingStockId}`, {
                     user_id: user.id,
-                    item_name: item.item_name,
+                    item_name: stockFormData.item_name,
                     quantity: quantity,
-                    category: item.category,
-                    expiry_date: item.expiry_date || undefined
+                    category: stockFormData.category,
+                    expiry_date: stockFormData.expiry_date || undefined
                 });
-            }));
+                showToast("Stock updated successfully!", 'success');
+            } else {
+                // CREATE New Stock
+                const itemsToSave = [...stockQueue];
+                if (stockFormData.item_name) itemsToSave.push(stockFormData);
+
+                if (itemsToSave.length === 0) return;
+
+                // Save all in parallel
+                await Promise.all(itemsToSave.map(item => {
+                    const quantity = `${item.quantity_num} ${item.unit}`;
+                    return api.post('/stock/', {
+                        user_id: user.id,
+                        item_name: item.item_name,
+                        quantity: quantity,
+                        category: item.category,
+                        expiry_date: item.expiry_date || undefined
+                    });
+                }));
+            }
 
             navigate('/');
         } catch (error) {
-            console.error("Error adding items:", error);
+            console.error("Error adding/updating items:", error);
             showToast(`Failed: ${error.message}`, 'error');
         } finally {
             setLoading(false);
@@ -438,19 +481,22 @@ const AddItem = () => {
                         )}
 
                         <div className="flex flex-col gap-3">
-                            <button
-                                onClick={handleAddAnotherStock}
-                                type="button"
-                                className="w-full bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-3 rounded-xl font-bold transition-all border border-white/10 uppercase tracking-wider text-sm"
-                            >
-                                + Add Another Item
-                            </button>
+                            {!editingStockId && (
+                                <button
+                                    onClick={handleAddAnotherStock}
+                                    type="button"
+                                    className="w-full bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 py-3 rounded-xl font-bold transition-all border border-white/10 uppercase tracking-wider text-sm"
+                                >
+                                    + Add Another Item
+                                </button>
+                            )}
                             <button type="submit" className="w-full btn-primary flex justify-center items-center gap-2 py-4">
                                 <Save size={18} />
-                                {stockQueue.length > 0
-                                    ? `Save All (${stockQueue.length + (stockFormData.item_name ? 1 : 0)})`
-                                    : "Save to Stock"
-                                }
+                                {editingStockId ? "Update Stock" : (
+                                    stockQueue.length > 0
+                                        ? `Save All (${stockQueue.length + (stockFormData.item_name ? 1 : 0)})`
+                                        : "Save to Stock"
+                                )}
                             </button>
                         </div>
                     </form>
