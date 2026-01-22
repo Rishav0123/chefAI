@@ -284,8 +284,13 @@ const AppContent = () => {
                                                 className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between group transition-colors ${activeKitchen?.id === k.id ? 'bg-accent/10 text-accent' : 'text-stone-400 hover:bg-white/5 hover:text-white'}`}
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    {k.name.includes("Personal") ? <Home size={14} /> : <Users size={14} />}
-                                                    {k.name}
+                                                    {k.name.includes("Personal") ? <Home size={14} className="shrink-0" /> : <Users size={14} className="shrink-0" />}
+                                                    <div className="flex flex-col items-start overflow-hidden">
+                                                        <span className="truncate w-full font-medium">{k.name}</span>
+                                                        {!k.name.includes("Personal") && k.invite_code && (
+                                                            <span className="text-[10px] text-stone-500 font-mono tracking-wider">CODE: {k.invite_code}</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 {activeKitchen?.id === k.id && <div className="w-2 h-2 rounded-full bg-accent"></div>}
                                             </button>
