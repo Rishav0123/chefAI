@@ -117,3 +117,18 @@ def get_meal_history(user_id: str, db: Session = Depends(get_db)):
     from app.models.meals import Meal
     meals = db.query(Meal).filter(Meal.user_id == user_id).order_by(Meal.created_at.desc()).limit(20).all()
     return meals
+
+@router.delete("/{meal_id}")
+def delete_meal(meal_id: str, db: Session = Depends(get_db)):
+    """
+    Delete a meal log.
+    Note: This currently does NOT restore the stock deducted.
+    """
+    from app.models.meals import Meal
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
+    if not meal:
+        raise HTTPException(status_code=404, detail="Meal not found")
+    
+    db.delete(meal)
+    db.commit()
+    return {"message": "Meal deleted successfully"}
