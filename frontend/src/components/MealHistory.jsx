@@ -170,7 +170,7 @@ const MealHistory = (props) => {
     );
 
     return (
-        <div className="mt-8">
+        <div>
             {/* Header / Stats (Full Page) */}
             {!props.limit ? (
                 <div className="mb-10 animate-fade-in">
