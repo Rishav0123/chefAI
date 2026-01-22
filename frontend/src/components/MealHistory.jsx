@@ -70,6 +70,66 @@ const MealHistory = (props) => {
         );
     }
 
+    // logic to show only first N items if limit prop is present
+    const displayedMeals = props.limit ? meals.slice(0, props.limit) : meals;
+
+    // --- Stats & Grouping Logic ---
+    const stats = !props.limit ? {
+        totalMeals: meals.length,
+        totalCalories: meals.reduce((sum, m) => sum + (m.calories || 0), 0),
+        avgProtein: Math.round(meals.reduce((sum, m) => sum + (m.protein_g || 0), 0) / (meals.length || 1))
+    } : null;
+
+    const groupedMeals = !props.limit ? meals.reduce((acc, meal) => {
+        const dateStr = meal.created_at
+            ? new Date(meal.created_at).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
+            : 'Unknown Date';
+        if (!acc[dateStr]) acc[dateStr] = [];
+        acc[dateStr].push(meal);
+        return acc;
+    }, {}) : null;
+
+    // Helper: Render Card
+    const renderMealCard = (meal) => (
+        <div key={meal.id} className="glass-panel p-4 md:p-6 relative group hover:scale-[1.02] transition-transform">
+            <div className="flex justify-between items-start mb-3 md:mb-4">
+                <h3 className="text-lg md:text-xl font-bold text-white truncate pr-4">{meal.name}</h3>
+                <div className="flex items-center gap-1 text-xs font-medium text-stone-400 bg-white/5 px-2 py-1 rounded-lg">
+                    <Clock size={12} />
+                    {meal.created_at ? new Date(meal.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                </div>
+            </div>
+
+            {/* Nutrition Badges */}
+            {/* Nutrition Badges */}
+            <div className="flex gap-2 mb-4">
+                {meal.calories && (
+                    <span className="text-sm font-bold text-orange-400">🔥 {meal.calories} kcal</span>
+                )}
+                {meal.protein_g && (
+                    <span className="text-sm font-bold text-blue-400">💪 {meal.protein_g}g prot</span>
+                )}
+            </div>
+
+            {/* Ingredients */}
+            {meal.ingredients_used && meal.ingredients_used.length > 0 && (
+                <div className="mt-2">
+                    <p className="text-xs text-stone-500 mb-2 uppercase tracking-wider font-bold">Ingredients</p>
+                    <div className="flex flex-wrap gap-2">
+                        {meal.ingredients_used.slice(0, 4).map((ing, idx) => (
+                            <span key={idx} className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/10">
+                                {ing.item}
+                            </span>
+                        ))}
+                        {meal.ingredients_used.length > 4 && (
+                            <span className="text-xs text-stone-500 px-1">+{meal.ingredients_used.length - 4} more</span>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
     return (
         <div className="mt-8">
             {/* Header / Stats (Full Page) */}
