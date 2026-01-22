@@ -100,7 +100,7 @@ class InventoryManager:
 
     def log_meal_and_deduct_stock(self, user_id: str, meal_name: str, ingredients_used: list, confidence: int = 100, 
                                   meal_type: str = "other", calories: int = None, protein_g: int = None, 
-                                  carbs_g: int = None, fat_g: int = None, deduct_stock: bool = True, source: str = "manual"):
+                                  carbs_g: int = None, fat_g: int = None, deduct_stock: bool = True, source: str = "manual", kitchen_id: str = None):
         """
         Logs a meal and optionally deducts ingredients from stock.
         """
@@ -141,11 +141,16 @@ class InventoryManager:
                 # Improved fuzzy matching: Check if stock name is inside used name OR used name is inside stock name
                 # This handles "Tomato" vs "Tomatoes" and "Mozzarella Cheese" vs "Cheese"
                 
+                # Find Matching Stock
+                # Priority: search kitchen_id if provided, else user_id
+                query = self.db.query(KitchenStock)
+                if kitchen_id:
+                    query = query.filter(KitchenStock.kitchen_id == kitchen_id)
+                else:
+                    query = query.filter(KitchenStock.user_id == user_id)
+
                 # 1. Direct Partial Match (Stock contains "Tomato")
-                stock_item = self.db.query(KitchenStock).filter(
-                    KitchenStock.user_id == user_id,
-                    KitchenStock.item_name.ilike(f"%{item_name}%") 
-                ).first()
+                stock_item = query.filter(KitchenStock.item_name.ilike(f"%{item_name}%")).first()
                 
                 # 2. Reverse Partial Match (Used "Tomatoes" contains "Tomato" from stock)
                 if not stock_item:

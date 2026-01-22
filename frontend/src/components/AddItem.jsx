@@ -185,7 +185,8 @@ const AddItem = () => {
     // Fetch existing stock for autocomplete
     useEffect(() => {
         if (user && activeTab === 'stock') {
-            api.get(`/stock/${user.id}`)
+            const targetId = activeKitchen?.id || user.id;
+            api.get(`/stock/${targetId}`)
                 .then(res => {
                     const names = [...new Set(res.data.map(item => item.item_name))];
                     setExistingStockNames(names);
@@ -391,6 +392,7 @@ const AddItem = () => {
                 await Promise.all(mealsToSave.map(meal => {
                     return api.post('/meals/', {
                         user_id: user.id,
+                        kitchen_id: activeKitchen?.id, // Link meal log (and deduction) to active kitchen
                         name: meal.name,
                         meal_type: meal.meal_type,
                         meal_source: meal.meal_source,

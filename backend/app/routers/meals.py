@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app.services.inventory import InventoryManager
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 router = APIRouter(
     prefix="/meals",
@@ -22,6 +22,7 @@ class MealLogRequest(BaseModel):
     protein_g: int = None
     carbs_g: int = None
     fat_g: int = None
+    kitchen_id: Optional[str] = None
 
 # --- AI Estimator ---
 import os
@@ -99,7 +100,8 @@ def log_meal(request: MealLogRequest, db: Session = Depends(get_db)):
             carbs_g=request.carbs_g,
             fat_g=request.fat_g,
             deduct_stock=should_deduct,
-            source=request.meal_source 
+            source=request.meal_source,
+            kitchen_id=request.kitchen_id
         )
         return {
             "message": "Meal logged successfully",
