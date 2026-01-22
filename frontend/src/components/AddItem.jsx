@@ -76,7 +76,7 @@ const AddItem = () => {
                 const queueItems = drafts.slice(0, -1).map(d => ({
                     name: d.name || '',
                     meal_type: d.meal_type || 'other',
-                    meal_source: d.deduct_stock ? 'home' : 'out',
+                    meal_source: (d.deduct_stock || (d.ingredients && d.ingredients.length > 0)) ? 'home' : 'outside',
                     calories: d.nutrition?.calories || '',
                     protein_g: d.nutrition?.protein || '',
                     carbs_g: d.nutrition?.carbs || '',
@@ -91,7 +91,7 @@ const AddItem = () => {
             setMealFormData({
                 name: lastDraft.name || '',
                 meal_type: lastDraft.meal_type || 'other',
-                meal_source: lastDraft.deduct_stock ? 'home' : 'out',
+                meal_source: (lastDraft.deduct_stock || (lastDraft.ingredients && lastDraft.ingredients.length > 0)) ? 'home' : 'outside',
                 calories: lastDraft.nutrition?.calories || '',
                 protein_g: lastDraft.nutrition?.protein || '',
                 carbs_g: lastDraft.nutrition?.carbs || '',
