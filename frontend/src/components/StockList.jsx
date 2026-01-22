@@ -59,44 +59,6 @@ const StockList = (props) => {
 
     if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Loading kitchen assets...</div>;
 
-    if (stocks.length === 0) {
-        return (
-            <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', padding: '2rem 1rem' }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-                    borderRadius: '24px',
-                    padding: '3rem 2rem',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 20px 50px -12px rgba(0, 0, 0, 0.5)'
-                }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🛒</div>
-                    <h2 style={{ fontSize: '1.8rem', marginBottom: '10px', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                        Your kitchen is looking bare!
-                    </h2>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.1rem' }}>
-                        Let's fill it up so I can recommend some delicious recipes for you.
-                    </p>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <Link to="/scan/bill" className="btn-primary" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', padding: '15px', fontSize: '1.1rem' }}>
-                            <UploadCloud size={24} />
-                            Scan a Receipt
-                        </Link>
-
-                        <Link to="/scan/item" className="glass-panel" style={{
-                            display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px',
-                            padding: '15px', color: 'var(--text-primary)', textDecoration: 'none',
-                            border: '1px solid rgba(255,255,255,0.2)', background: 'transparent'
-                        }}>
-                            <Camera size={24} color="var(--accent)" />
-                            Scan Single Item
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
     // Helper to render a single card (Used in both Widget and Full views)
     const renderStockCard = (item) => (
         <div key={item.stock_id} className="glass-panel p-4 md:p-6 relative group transition-all hover:scale-[1.02]">
@@ -139,6 +101,34 @@ const StockList = (props) => {
                         <span>Expires {item.expiry_date}</span>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+
+    // Empty State Component
+    const EmptyState = () => (
+        <div className="glass-panel p-8 md:p-12 text-center flex flex-col items-center justify-center border border-white/5 shadow-2xl">
+            <div className="w-20 h-20 bg-stone-800 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <UploadCloud size={40} className="text-stone-400" />
+            </div>
+
+            <h2 className="text-xl md:text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-stone-400">
+                Your kitchen is looking bare!
+            </h2>
+            <p className="text-stone-400 mb-8 max-w-sm mx-auto text-sm md:text-base">
+                Let's fill it up so I can recommend some delicious recipes for you.
+            </p>
+
+            <div className="flex flex-col w-full max-w-xs gap-3">
+                <Link to="/scan/bill" className="btn-primary w-full justify-center py-3 text-base flex items-center gap-2">
+                    <UploadCloud size={20} />
+                    Scan a Receipt
+                </Link>
+
+                <Link to="/scan/item" className="btn-glass w-full justify-center py-3 text-base flex items-center gap-2">
+                    <Camera size={20} className="text-accent" />
+                    Scan Single Item
+                </Link>
             </div>
         </div>
     );
@@ -266,9 +256,13 @@ const StockList = (props) => {
                 </div>
             ) : (
                 /* Widget Flat Grid */
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                    {stocks.slice(0, props.limit).map(renderStockCard)}
-                </div>
+                stocks.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                        {stocks.slice(0, props.limit).map(renderStockCard)}
+                    </div>
+                ) : (
+                    <EmptyState />
+                )
             )}
 
             {props.limit && stocks.length > 0 && (
