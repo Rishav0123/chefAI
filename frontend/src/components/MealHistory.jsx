@@ -103,8 +103,8 @@ const MealHistory = (props) => {
     // Helper: Render Card
     const renderMealCard = (meal) => (
         <div key={meal.id} className="glass-panel p-4 md:p-6 relative group hover:scale-[1.02] transition-transform">
-            {/* Edit/Delete Overlay (Same as StockList) */}
-            <div className="absolute top-4 right-4 md:top-6 md:right-6 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10">
+            {/* Edit/Delete Overlay */}
+            <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10">
                 {/* Note: Edit isn't fully implemented, linking to same page for now or just visual */}
                 <button className="p-1.5 md:p-2 hover:bg-white/10 rounded-lg text-stone-400 hover:text-white transition-colors cursor-not-allowed" title="Edit coming soon">
                     <Edit2 size={14} className="md:w-4 md:h-4" />
