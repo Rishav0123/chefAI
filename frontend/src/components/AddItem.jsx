@@ -389,6 +389,9 @@ const AddItem = () => {
 
                 if (mealsToSave.length === 0) return;
 
+                // DEBUG: Check activeKitchen
+                alert(`Saving Meal. Active Kitchen: ${activeKitchen?.name} (ID: ${activeKitchen?.id})`);
+
                 await Promise.all(mealsToSave.map(meal => {
                     return api.post('/meals/', {
                         user_id: user.id,
