@@ -21,6 +21,7 @@ class Meal(Base):
     carbs_g = Column(Integer, nullable=True)
     fat_g = Column(Integer, nullable=True)
     source = Column(String) # manual, imported, predicted
+    kitchen_id = Column(String, nullable=True) # ID of the kitchen where this was cooked
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="meals")

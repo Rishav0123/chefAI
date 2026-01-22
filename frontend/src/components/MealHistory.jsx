@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const MealHistory = (props) => {
     const navigate = useNavigate();
-    const { user, stockRefreshTrigger } = useContext(UserContext); // Refetch when stock refreshes (implies meal logged)
+    const { user, stockRefreshTrigger, kitchens } = useContext(UserContext); // Refetch when stock refreshes (implies meal logged)
     const [meals, setMeals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -139,6 +139,25 @@ const MealHistory = (props) => {
                 </div>
             </div>
 
+
+            {/* Source Badge */}
+            <div className="mb-3 flex gap-2">
+                {meal.source === 'outside' ? (
+                    <span className="text-[10px] uppercase font-bold text-stone-500 border border-stone-700 px-2 py-0.5 rounded-md bg-stone-800/50">
+                        Dining Out
+                    </span>
+                ) : (
+                    <span className="text-[10px] uppercase font-bold text-emerald-500/80 border border-emerald-500/20 px-2 py-0.5 rounded-md bg-emerald-500/5 flex items-center gap-1">
+                        {meal.kitchen_id ? (
+                            <>
+                                <Utensils size={10} />
+                                {kitchens.find(k => k.id === meal.kitchen_id)?.name || "Shared Kitchen"}
+                            </>
+                        ) : "Home Cooked"}
+                    </span>
+                )}
+            </div>
+
             {/* Nutrition Badges */}
             {/* Nutrition Badges */}
             <div className="flex gap-2 mb-4">
@@ -151,22 +170,24 @@ const MealHistory = (props) => {
             </div>
 
             {/* Ingredients */}
-            {meal.ingredients_used && meal.ingredients_used.length > 0 && (
-                <div className="mt-2">
-                    <p className="text-xs text-stone-500 mb-2 uppercase tracking-wider font-bold">Ingredients</p>
-                    <div className="flex flex-wrap gap-2">
-                        {meal.ingredients_used.slice(0, 4).map((ing, idx) => (
-                            <span key={idx} className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/10">
-                                {ing.item}
-                            </span>
-                        ))}
-                        {meal.ingredients_used.length > 4 && (
-                            <span className="text-xs text-stone-500 px-1">+{meal.ingredients_used.length - 4} more</span>
-                        )}
+            {
+                meal.ingredients_used && meal.ingredients_used.length > 0 && (
+                    <div className="mt-2">
+                        <p className="text-xs text-stone-500 mb-2 uppercase tracking-wider font-bold">Ingredients</p>
+                        <div className="flex flex-wrap gap-2">
+                            {meal.ingredients_used.slice(0, 4).map((ing, idx) => (
+                                <span key={idx} className="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/10">
+                                    {ing.item}
+                                </span>
+                            ))}
+                            {meal.ingredients_used.length > 4 && (
+                                <span className="text-xs text-stone-500 px-1">+{meal.ingredients_used.length - 4} more</span>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 
     return (

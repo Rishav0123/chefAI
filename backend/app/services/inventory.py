@@ -115,7 +115,9 @@ class InventoryManager:
             protein_g=protein_g,
             carbs_g=carbs_g,
             fat_g=fat_g,
-            source=source
+
+            source=source,
+            kitchen_id=kitchen_id
         )
         self.db.add(meal)
         
