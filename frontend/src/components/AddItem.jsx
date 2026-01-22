@@ -404,27 +404,43 @@ const AddItem = () => {
             }
 
             // --- Check for Leftover Stock Logic ---
-            // Only check if we are saving the current form meal specifically, or if queue has items?
-            // The prompt logic handles "mealFormData" which is the *current* form. 
-            // The logic implies we only check leftovers for the *current* meal being entered or perhaps the last one?
-            // Existing logic checked `mealFormData`. If we skip submitting `mealFormData` because it's empty, we shouldn't check it.
-
-            if (hasCurrentMeal && mealFormData.meal_source === 'home' && mealFormData.ingredients_used.length > 0) {
-                const missingIngredients = mealFormData.ingredients_used.filter(ing => {
-                    return !existingStockNames.some(stockName =>
-                        stockName.toLowerCase().includes(ing.item.toLowerCase()) ||
-                        ing.item.toLowerCase().includes(stockName.toLowerCase())
-                    );
-                });
-
-                if (missingIngredients.length > 0) {
-                    setPendingLeftovers(missingIngredients);
-                    setLoading(false);
-                    return; // Do NOT navigate yet
-                }
+            // Collect all meals that were just saved (or about to be saved)
+            let allMealsToCheck = [];
+            if (editingMealId) {
+                // If editing, only check the current form
+                if (hasCurrentMeal) allMealsToCheck.push(mealFormData);
+            } else {
+                // If creating new, check both queue and current form
+                allMealsToCheck = [...mealQueue];
+                if (hasCurrentMeal) allMealsToCheck.push(mealFormData);
             }
-            // Note: If saving from queue only, we skip the leftover check for simplicity or we'd need to iterate all.
-            // For now, retaining behavior for `mealFormData` only.
+
+            let allMissingIngredients = [];
+
+            allMealsToCheck.forEach(meal => {
+                if (meal.meal_source === 'home' && meal.ingredients_used && meal.ingredients_used.length > 0) {
+                    const missing = meal.ingredients_used.filter(ing => {
+                        return !existingStockNames.some(stockName =>
+                            stockName.toLowerCase().includes(ing.item.toLowerCase()) ||
+                            ing.item.toLowerCase().includes(stockName.toLowerCase())
+                        );
+                    });
+                    allMissingIngredients = [...allMissingIngredients, ...missing];
+                }
+            });
+
+            // Remove duplicates from missing ingredients list based on item name
+            allMissingIngredients = allMissingIngredients.filter((ing, index, self) =>
+                index === self.findIndex((t) => (
+                    t.item.toLowerCase() === ing.item.toLowerCase()
+                ))
+            );
+
+            if (allMissingIngredients.length > 0) {
+                setPendingLeftovers(allMissingIngredients);
+                setLoading(false);
+                return; // Do NOT navigate yet
+            }
 
             navigate('/');
         } catch (error) {
