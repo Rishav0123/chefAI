@@ -136,7 +136,7 @@ const Dashboard = () => {
                     </div>
                     <div className="text-left md:text-left flex-1 md:flex-none">
                         <h3 className="text-base md:text-xl font-bold mb-0.5 md:mb-1 text-white">Shopping List</h3>
-                        <p className="text-stone-500 text-xs md:text-sm">Automated by AI</p>
+                        <p className="text-accent text-xs md:text-sm font-medium animate-pulse">Coming Soon</p>
                     </div>
                 </div>
             </section>
