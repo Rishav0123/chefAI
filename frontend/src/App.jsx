@@ -13,6 +13,7 @@ import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles,
 import MealHistory from './components/MealHistory';
 import ProfileModal from './components/ProfileModal';
 import ScanMethod from './components/ScanMethod';
+import KitchenManager from './components/KitchenManager';
 import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
 
@@ -210,6 +211,7 @@ const AppContent = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [isKitchenMenuOpen, setIsKitchenMenuOpen] = useState(false);
+    const [isKitchenManagerOpen, setIsKitchenManagerOpen] = useState(false);
 
     if (loading) {
         return (
@@ -290,7 +292,13 @@ const AppContent = () => {
                                         ))}
                                     </div>
                                     <div className="pt-2 border-t border-white/5">
-                                        <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-stone-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                                        <button
+                                            onClick={() => {
+                                                setIsKitchenMenuOpen(false);
+                                                setIsKitchenManagerOpen(true);
+                                            }}
+                                            className="w-full text-left px-3 py-2 rounded-lg text-sm text-stone-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors"
+                                        >
                                             <PlusCircle size={14} />
                                             Create or Join Group
                                         </button>
@@ -321,11 +329,18 @@ const AppContent = () => {
                         <Route path="/inventory" element={<div className="animate-fade-in"><StockList /></div>} />
                         <Route path="/meals" element={<div className="animate-fade-in"><MealHistory /></div>} />
                     </Routes>
+
+                    <KitchenManager isOpen={isKitchenManagerOpen} onClose={() => setIsKitchenManagerOpen(false)} />
+
+                    <ProfileModal
+                        isOpen={isProfileOpen}
+                        onClose={() => setIsProfileOpen(false)}
+                        user={user}
+                        logout={logout}
+                    />
                 </main>
 
                 <ChatWidgetButton />
-
-                <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
             </div>
         </Router>
     );
