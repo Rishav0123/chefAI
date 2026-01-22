@@ -5,7 +5,7 @@ from ..db import get_db
 from ..models.workspace import Kitchen, KitchenMember
 from ..models.kitchen import User
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import secrets
 import string
 
@@ -28,7 +28,7 @@ class KitchenResponse(BaseModel):
     id: str
     name: str
     role: str
-    invite_code: str
+    invite_code: Optional[str] = None
     is_active: bool
 
 # --- Helpers ---
