@@ -692,6 +692,7 @@ const AddItem = () => {
                                         newQueue.splice(i, 1);
                                         setMealQueue(newQueue);
                                         showToast("Loaded meal for editing", "success");
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
                                 >
                                     <div className="flex justify-between items-start mb-2 pointer-events-none">
@@ -734,7 +735,8 @@ const AddItem = () => {
                                     {/* Delete Button (Visual Only for now, logic needed) */}
                                     <button
                                         type="button"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.stopPropagation();
                                             const newQueue = [...mealQueue];
                                             newQueue.splice(i, 1);
                                             setMealQueue(newQueue);
