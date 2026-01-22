@@ -795,6 +795,7 @@ const AddItem = () => {
                                         };
                                     });
 
+                                    setPendingLeftovers(null);
                                     navigate('/add?mode=stock', { state: { stockDrafts: stockDrafts } });
                                 }}
                                 className="flex-1 btn-primary justify-center font-bold"
