@@ -9,7 +9,7 @@ import ChatAssistant from './components/ChatAssistant';
 import Login from './components/Login';
 import ChatWidgetButton from './components/ChatWidgetButton';
 import { UserProvider, UserContext } from './context/UserContext';
-import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles, UploadCloud, Camera, Activity } from 'lucide-react';
+import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles, UploadCloud, Camera, Activity, ChevronDown, Home, Users } from 'lucide-react';
 import MealHistory from './components/MealHistory';
 import ProfileModal from './components/ProfileModal';
 import ScanMethod from './components/ScanMethod';
@@ -206,9 +206,10 @@ import LandingPage from './components/LandingPage';
 
 // Main App Structure with Auth Logic
 const AppContent = () => {
-    const { user, loading } = React.useContext(UserContext);
+    const { user, loading, kitchens, activeKitchen, switchKitchen } = React.useContext(UserContext);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
+    const [isKitchenMenuOpen, setIsKitchenMenuOpen] = useState(false);
 
     if (loading) {
         return (
@@ -249,10 +250,59 @@ const AppContent = () => {
                     </Link>
 
                     <div className="flex items-center gap-4">
+                        {/* Kitchen Switcher */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsKitchenMenuOpen(!isKitchenMenuOpen)}
+                                className="flex items-center gap-2 bg-stone-800 border border-white/10 px-4 py-2 rounded-xl text-stone-300 hover:text-white hover:border-accent/50 transition-all text-sm font-medium"
+                            >
+                                {activeKitchen ? (
+                                    <>
+                                        {activeKitchen.role === 'admin' && activeKitchen.name.includes("Personal") ? <Home size={16} /> : <Users size={16} />}
+                                        <span className="truncate max-w-[120px]">{activeKitchen.name}</span>
+                                    </>
+                                ) : (
+                                    <span>Loading...</span>
+                                )}
+                                <ChevronDown size={14} className="text-stone-500" />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {isKitchenMenuOpen && (
+                                <div className="absolute top-full right-0 mt-2 w-64 bg-stone-900 border border-white/10 rounded-xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                                    <h4 className="px-3 py-2 text-xs font-bold text-stone-500 uppercase tracking-widest">Switch Workspace</h4>
+                                    <div className="space-y-1 mb-2">
+                                        {kitchens.map(k => (
+                                            <button
+                                                key={k.id}
+                                                onClick={() => {
+                                                    switchKitchen(k.id);
+                                                    setIsKitchenMenuOpen(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center justify-between group transition-colors ${activeKitchen?.id === k.id ? 'bg-accent/10 text-accent' : 'text-stone-400 hover:bg-white/5 hover:text-white'}`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    {k.name.includes("Personal") ? <Home size={14} /> : <Users size={14} />}
+                                                    {k.name}
+                                                </div>
+                                                {activeKitchen?.id === k.id && <div className="w-2 h-2 rounded-full bg-accent"></div>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="pt-2 border-t border-white/5">
+                                        <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-stone-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-colors">
+                                            <PlusCircle size={14} />
+                                            Create or Join Group
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         {/* User Profile Hook */}
                         <button
                             onClick={() => setIsProfileOpen(true)}
-                            className="w-10 h-10 rounded-full bg-stone-800 border border-border-color flex items-center justify-center text-stone-400 hover:text-white hover:border-accent hover:bg-stone-700 transition-all cursor-pointer shadow-lg z-50 relative"
+                            className="w-10 h-10 rounded-full bg-stone-800 border border-white/10 flex items-center justify-center text-stone-400 hover:text-white hover:border-accent hover:bg-stone-700 transition-all cursor-pointer shadow-lg z-50 relative"
                         >
                             <UserIcon size={18} />
                         </button>

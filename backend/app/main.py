@@ -1,9 +1,9 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .models import kitchen, base, chat as chat_model, meals
+from .models import kitchen, base, chat as chat_model, meals, workspace
 from .db import engine
-from app.routers import stock, upload, users, chat, meals
+from app.routers import stock, upload, users, chat, meals, kitchens
 from app.migration_utils import check_and_migrate_meals_table
 import os
 from dotenv import load_dotenv
@@ -47,6 +47,13 @@ async def lifespan(app: FastAPI):
     print("Shutting down...", flush=True)
 
 app = FastAPI(title="Kitchen Buddy API", lifespan=lifespan)
+
+app.include_router(users.router)
+app.include_router(stock.router)
+app.include_router(upload.router)
+app.include_router(chat.router)
+app.include_router(meals.router)
+app.include_router(kitchens.router)
 
 app.add_middleware(
     CORSMiddleware,

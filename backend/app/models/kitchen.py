@@ -22,6 +22,11 @@ class User(Base):
     chat_history = relationship("ChatMessage", back_populates="user")
     meals = relationship("Meal", back_populates="user")
     profile = relationship("UserProfile", back_populates="user", uselist=False)
+    
+    # Kitchen Relationships
+    owned_kitchens = relationship("Kitchen", back_populates="owner")
+    memberships = relationship("KitchenMember", back_populates="user")
+
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"
@@ -50,8 +55,12 @@ class KitchenStock(Base):
     expiry_date = Column(Date, nullable=True)
     source = Column(String)    # manual | bill | screenshot
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Link to Kitchen instead of User directly
+    kitchen_id = Column(String, ForeignKey("kitchens.id"), nullable=True) 
 
     user = relationship("User", back_populates="stocks")
+    kitchen = relationship("Kitchen", back_populates="stocks")
 
 class Uploads(Base):
     __tablename__ = "uploads"
