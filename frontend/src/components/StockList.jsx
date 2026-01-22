@@ -215,15 +215,11 @@ const StockList = (props) => {
                 </div>
             ) : (
                 /* Widget Header */
-                <div className="flex justify-between items-center mb-4 md:mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-accent">
-                            <Package size={18} className="md:w-5 md:h-5" />
-                        </div>
-                        <h2 className="text-lg md:text-2xl font-black tracking-tight text-white">
-                            Pantry Intelligence
-                        </h2>
-                    </div>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+                        <Package size={24} className="text-accent" />
+                        Pantry Intelligence
+                    </h2>
                 </div>
             )}
 
