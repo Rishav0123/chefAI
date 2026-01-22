@@ -490,9 +490,28 @@ const AddItem = () => {
                                 <h4 className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-2">Ready to Add ({stockQueue.length})</h4>
                                 <ul className="space-y-1">
                                     {stockQueue.map((item, i) => (
-                                        <li key={i} className="text-white text-sm flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
-                                            {item.item_name} <span className="text-stone-500">({item.quantity_num} {item.unit})</span>
+                                        <li
+                                            key={i}
+                                            className="text-white text-sm flex items-center gap-2 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors group relative"
+                                            onClick={() => {
+                                                // Load back into form
+                                                setStockFormData({
+                                                    item_name: item.item_name,
+                                                    quantity_num: item.quantity_num,
+                                                    unit: item.unit,
+                                                    category: item.category,
+                                                    expiry_date: item.expiry_date
+                                                });
+                                                // Remove from queue
+                                                const newQueue = [...stockQueue];
+                                                newQueue.splice(i, 1);
+                                                setStockQueue(newQueue);
+                                            }}
+                                            title="Click to edit"
+                                        >
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent group-hover:scale-125 transition-transform"></div>
+                                            <span className="flex-1">{item.item_name} <span className="text-stone-500">({item.quantity_num} {item.unit})</span></span>
+                                            <span className="text-xs text-stone-500 opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -663,8 +682,19 @@ const AddItem = () => {
                         {/* Queue Display: Render as Cards */}
                         <div className="space-y-4 mb-6">
                             {mealQueue.map((m, i) => (
-                                <div key={i} className="p-5 rounded-2xl bg-stone-800 border border-orange-500/30 shadow-lg relative animate-fade-in group">
-                                    <div className="flex justify-between items-start mb-2">
+                                <div key={i}
+                                    className="p-5 rounded-2xl bg-stone-800 border border-orange-500/30 shadow-lg relative animate-fade-in group cursor-pointer hover:bg-stone-700 transition-colors"
+                                    onClick={() => {
+                                        // Load back into form
+                                        setMealFormData(m);
+                                        // Remove from queue
+                                        const newQueue = [...mealQueue];
+                                        newQueue.splice(i, 1);
+                                        setMealQueue(newQueue);
+                                        showToast("Loaded meal for editing", "success");
+                                    }}
+                                >
+                                    <div className="flex justify-between items-start mb-2 pointer-events-none">
                                         <div>
                                             <h4 className="text-white font-bold text-lg">{m.name}</h4>
                                             <div className="flex gap-2 mt-1">
