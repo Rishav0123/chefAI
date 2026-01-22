@@ -110,9 +110,9 @@ const LandingPage = ({ onGetStarted }) => {
                     <div className="glass-panel p-6 flex items-start gap-4 hover:bg-white/5 transition-colors group rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm">
                         <div className="w-12 h-12 rounded-xl bg-stone-800 flex items-center justify-center text-orange-500 font-black text-xl border border-white/5 group-hover:scale-110 transition-transform shadow-lg">3</div>
                         <div>
-                            <h3 className="text-white font-bold text-lg mb-1">Cook & Deduct</h3>
+                            <h3 className="text-white font-bold text-lg mb-1">Cook & Track</h3>
                             <p className="text-stone-400 text-sm leading-relaxed">
-                                Log your meal with one click. AI deducts ingredients from the shared stock automatically.
+                                Log meals to auto-deduct stock and update your daily nutrition stats instantly.
                             </p>
                         </div>
                     </div>
@@ -133,14 +133,14 @@ const LandingPage = ({ onGetStarted }) => {
                         </p>
                     </div>
 
-                    {/* Feature 2: Visual Inventory */}
+                    {/* Feature 2: Smart Inventory */}
                     <div className="group p-6 md:p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
                         <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
                             <Camera size={28} className="text-purple-500" />
                         </div>
-                        <h3 className="text-2xl font-bold mb-4">Visual Inventory</h3>
+                        <h3 className="text-2xl font-bold mb-4">Smart Inventory</h3>
                         <p className="text-stone-400 leading-relaxed">
-                            Forget typing. Just snap a photo of your receipt or fridge. AI instantly identifies ingredients and updates stock.
+                            Scan receipts to update stock. Track expiry dates, organize by category, and get low-stock alerts.
                         </p>
                     </div>
 
@@ -151,18 +151,18 @@ const LandingPage = ({ onGetStarted }) => {
                         </div>
                         <h3 className="text-2xl font-bold mb-4">Chef AI Chat</h3>
                         <p className="text-stone-400 leading-relaxed">
-                            "I have chicken and rice. What can I make in 20 mins?" The AI suggests personalized recipes based on your stock.
+                            "I have chicken and rice. What can I make?" The AI suggests recipes based on your actual inventory.
                         </p>
                     </div>
 
-                    {/* Feature 4: Smart Deductions */}
+                    {/* Feature 4: Nutrition Analytics */}
                     <div className="group p-8 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-500 hover:border-orange-500/20">
                         <div className="w-14 h-14 rounded-2xl bg-stone-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl">
-                            <Flame size={28} className="text-red-500" />
+                            <Activity size={28} className="text-green-500" />
                         </div>
-                        <h3 className="text-2xl font-bold mb-4">Smart Tracking</h3>
+                        <h3 className="text-2xl font-bold mb-4">Nutrition Analytics</h3>
                         <p className="text-stone-400 leading-relaxed">
-                            Cooking a recipe? One click deducts ingredients from your shared stock. Tracks nutrition and usage automatically.
+                            Auto-calculate calories and macros for every meal. Visualize your daily intake and health goals.
                         </p>
                     </div>
                 </div>
