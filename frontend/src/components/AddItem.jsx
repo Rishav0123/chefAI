@@ -533,12 +533,15 @@ const AddItem = () => {
                                             key={i}
                                             className="text-white text-sm flex items-center gap-2 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors group relative"
                                             onClick={() => {
-                                                // Swap logic: if form has data, push valid form data to queue
+                                                // Swap logic: if form has data, perform in-place swap
                                                 const newQueue = [...stockQueue];
 
                                                 if (stockFormData.item_name) {
-                                                    // Push current form to queue
-                                                    newQueue.push(stockFormData);
+                                                    // Replace the item at this index with current form data
+                                                    newQueue[i] = { ...stockFormData };
+                                                } else {
+                                                    // Form is empty, just remove the item from queue (it moves to form)
+                                                    newQueue.splice(i, 1);
                                                 }
 
                                                 // Load back into form
@@ -550,11 +553,6 @@ const AddItem = () => {
                                                     expiry_date: item.expiry_date
                                                 });
 
-                                                // Remove clicked item from queue (it's now in form)
-                                                // Note: We need to find the correct index if we pushed to queue above? 
-                                                // No, 'i' is the index of 'item' in the *original* 'stockQueue' mapping.
-                                                // Since we spread 'stockQueue' into 'newQueue', 'i' corresponds to the same item.
-                                                newQueue.splice(i, 1);
                                                 setStockQueue(newQueue);
                                             }}
                                             title="Click to edit"
@@ -736,9 +734,12 @@ const AddItem = () => {
                                     onClick={() => {
                                         const newQueue = [...mealQueue];
 
-                                        // 1. Swap Logic: If form has data, push it to queue first
+                                        // 1. Swap Logic: If form has data, replace item at current index
                                         if (mealFormData.name) {
-                                            newQueue.push(mealFormData);
+                                            newQueue[i] = { ...mealFormData };
+                                        } else {
+                                            // Form is empty, just remove the item
+                                            newQueue.splice(i, 1);
                                         }
 
                                         // 2. Load clicked item into form
@@ -753,9 +754,6 @@ const AddItem = () => {
                                             fat_g: m.fat_g || ''
                                         });
 
-                                        // 3. Remove clicked item from queue
-                                        // 'i' is stable because we only appended to the end of newQueue
-                                        newQueue.splice(i, 1);
                                         setMealQueue(newQueue);
                                         showToast("Loaded meal for editing", "success");
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
