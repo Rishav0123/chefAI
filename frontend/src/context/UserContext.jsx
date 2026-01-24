@@ -11,21 +11,38 @@ export const UserProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        console.log("UserProvider mounted. Starting auth check...");
+
+        const timeout = setTimeout(() => {
+            console.error("Auth check timed out! Forcing load.");
+            setLoading(false);
+        }, 5000);
+
         // Check active sessions and sets the user
         supabase.auth.getSession().then(({ data: { session } }) => {
+            console.log("Auth check complete. Session:", session ? "FOUND" : "NULL");
+            clearTimeout(timeout);
             setSession(session);
             setUser(session?.user ?? null);
+            setLoading(false);
+        }).catch(err => {
+            console.error("Auth check failed:", err);
+            clearTimeout(timeout);
             setLoading(false);
         });
 
         // Listen for changes on auth state (logged in, signed out, etc.)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            console.log("Auth state changed:", _event);
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            clearTimeout(timeout);
+            subscription.unsubscribe();
+        };
     }, []);
 
     const logout = async () => {
@@ -101,7 +118,11 @@ export const UserProvider = ({ children }) => {
             switchKitchen,
             refreshKitchens: fetchKitchens
         }}>
-            {!loading && children}
+            {loading ? (
+                <div className="flex h-screen items-center justify-center bg-stone-950 text-stone-500">
+                    Initializing Chef AI...
+                </div>
+            ) : children}
         </UserContext.Provider>
     );
 };
