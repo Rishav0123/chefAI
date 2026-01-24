@@ -6,25 +6,47 @@ import { Activity, Flame, Wheat, Droplet, Utensils } from 'lucide-react';
 const DailyNutrition = () => {
     const { user, stockRefreshTrigger } = useContext(UserContext);
     const [stats, setStats] = useState({ calories: 0, protein: 0, carbs: 0, fat: 0 });
-    const [loading, setLoading] = useState(true);
-
-    const GOALS = {
+    const [goals, setGoals] = useState({
         calories: 2000,
-        protein: 150, // High protein diet default
+        protein: 150,
         carbs: 250,
         fat: 70
-    };
+    });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user?.id) calculateDailyStats();
+        if (user?.id) {
+            fetchData();
+        }
 
         const onFocus = () => {
-            if (user?.id) calculateDailyStats();
+            if (user?.id) fetchData();
         };
 
         window.addEventListener('focus', onFocus);
         return () => window.removeEventListener('focus', onFocus);
     }, [user?.id, stockRefreshTrigger]);
+
+    const fetchData = async () => {
+        await Promise.all([calculateDailyStats(), fetchUserGoals()]);
+        setLoading(false);
+    };
+
+    const fetchUserGoals = async () => {
+        try {
+            const res = await api.get(`/users/${user.id}`);
+            if (res.data) {
+                setGoals({
+                    calories: res.data.daily_calories || 2000,
+                    protein: res.data.daily_protein || 150,
+                    carbs: res.data.daily_carbs || 250,
+                    fat: res.data.daily_fat || 70
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching goals:", error);
+        }
+    };
 
     const calculateDailyStats = async () => {
         try {
@@ -48,8 +70,6 @@ const DailyNutrition = () => {
             setStats(totals);
         } catch (error) {
             console.error("Error calculating nutrition:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -107,7 +127,7 @@ const DailyNutrition = () => {
                     {Math.round(stats.calories)} <span className="text-sm text-stone-500 font-medium">kcal</span>
                 </div>
                 <div className="text-xs font-bold text-green-500 uppercase tracking-widest bg-green-500/10 py-1 px-3 rounded-full inline-block">
-                    {Math.round((stats.calories / GOALS.calories) * 100)}% of Goal
+                    {Math.round((stats.calories / goals.calories) * 100)}% of Goal
                 </div>
             </div>
 
@@ -116,21 +136,21 @@ const DailyNutrition = () => {
                 <ProgressBar
                     label="Protein"
                     current={stats.protein}
-                    max={GOALS.protein}
+                    max={goals.protein}
                     icon={Utensils}
                     color="text-blue-500"
                 />
                 <ProgressBar
                     label="Carbs"
                     current={stats.carbs}
-                    max={GOALS.carbs}
+                    max={goals.carbs}
                     icon={Wheat}
                     color="text-yellow-500"
                 />
                 <ProgressBar
-                    label="Fats"
+                    label="Fat"
                     current={stats.fat}
-                    max={GOALS.fat}
+                    max={goals.fat}
                     icon={Droplet}
                     color="text-red-500"
                 />
