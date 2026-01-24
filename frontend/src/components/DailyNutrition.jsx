@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import api from '../api';
 import { UserContext } from '../context/UserContext';
+import { Link } from 'react-router-dom';
 import { Activity, Flame, Wheat, Droplet, Utensils } from 'lucide-react';
 
 const DailyNutrition = () => {
@@ -107,9 +108,9 @@ const DailyNutrition = () => {
     );
 
     return (
-        <div className="glass-panel p-4 md:p-6 relative overflow-hidden">
+        <Link to="/body-goals" className="glass-panel p-4 md:p-6 relative overflow-hidden block hover:border-accent/50 transition-colors group">
             {/* Decorative Background Blur */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-[50px] -mr-10 -mt-10 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-[50px] -mr-10 -mt-10 pointer-events-none group-hover:bg-green-500/10 transition-colors"></div>
 
             <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
@@ -155,7 +156,7 @@ const DailyNutrition = () => {
                     color="text-red-500"
                 />
             </div>
-        </div>
+        </Link>
     );
 };
 

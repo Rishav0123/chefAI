@@ -13,6 +13,7 @@ import { UserProvider, UserContext } from './context/UserContext';
 import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles, UploadCloud, Camera, Activity, ChevronDown, Home, Users, Flame } from 'lucide-react';
 import MealHistory from './components/MealHistory';
 import ScanMethod from './components/ScanMethod';
+import BodyGoals from './components/BodyGoals';
 import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
 
@@ -245,8 +246,9 @@ const AppContent = () => {
                 <main className="w-full max-w-[1600px] mx-auto px-4 md:px-8 pt-24">
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
-                        <Route path="/add" element={<AddItem />} />
-                        <Route path="/scan" element={<ScanMethod />} />
+                        <Route path="/history" element={<MealHistory />} />
+                        <Route path="/scan-method" element={<ScanMethod />} />
+                        <Route path="/body-goals" element={<BodyGoals />} />
                         <Route path="/scan/bill" element={<UploadBill mode="bill" />} />
                         <Route path="/scan/item" element={<UploadBill mode="single" />} />
                         <Route path="/scan/meal" element={<UploadBill mode="meal" />} />
