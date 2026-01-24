@@ -18,6 +18,11 @@ class UserProfileUpdate(BaseModel):
     weight: Optional[int] = None
     age: Optional[int] = None
     activity_level: Optional[str] = None
+    # Goals
+    daily_calories: Optional[int] = None
+    daily_protein: Optional[int] = None
+    daily_carbs: Optional[int] = None
+    daily_fat: Optional[int] = None
 
 @router.get("/{user_id}")
 def get_user_profile(user_id: str, db: Session = Depends(get_db)):
@@ -71,7 +76,11 @@ def get_user_profile(user_id: str, db: Session = Depends(get_db)):
             "height": user.profile.height_cm,
             "weight": user.profile.weight_kg,
             "age": user.profile.age,
-            "activity_level": user.profile.activity_level
+            "activity_level": user.profile.activity_level,
+            "daily_calories": user.profile.daily_calories or 2000,
+            "daily_protein": user.profile.daily_protein or 150,
+            "daily_carbs": user.profile.daily_carbs or 250,
+            "daily_fat": user.profile.daily_fat or 70
         })
     
     return profile_data
@@ -107,6 +116,17 @@ def update_user_profile(user_id: str, profile: UserProfileUpdate, db: Session = 
         db_profile.age = profile.age
     if profile.activity_level is not None:
         db_profile.activity_level = profile.activity_level
+
+    # Update Goals
+    if profile.daily_calories is not None:
+        db_profile.daily_calories = profile.daily_calories
+    if profile.daily_protein is not None:
+        db_profile.daily_protein = profile.daily_protein
+    if profile.daily_carbs is not None:
+        db_profile.daily_carbs = profile.daily_carbs
+    if profile.daily_fat is not None:
+        db_profile.daily_fat = profile.daily_fat
+
 
     db.commit()
     db.refresh(db_user)

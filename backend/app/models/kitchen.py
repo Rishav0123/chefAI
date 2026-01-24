@@ -40,6 +40,13 @@ class UserProfile(Base):
     weight_kg = Column(Integer)
     dietary_type = Column(String, default="Standard")
     allergies = Column(Text)
+    
+    # Nutritional Goals
+    daily_calories = Column(Integer, default=2000)
+    daily_protein = Column(Integer, default=150)
+    daily_carbs = Column(Integer, default=250)
+    daily_fat = Column(Integer, default=70)
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="profile")
