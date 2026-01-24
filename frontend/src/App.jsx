@@ -276,11 +276,11 @@ const AppContent = () => {
 
 const App = () => {
     return (
-        <UserProvider>
-            <ErrorBoundary>
+        <ErrorBoundary>
+            <UserProvider>
                 <AppContent />
-            </ErrorBoundary>
-        </UserProvider>
+            </UserProvider>
+        </ErrorBoundary>
     );
 };
 
