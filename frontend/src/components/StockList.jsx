@@ -12,14 +12,10 @@ const StockList = (props) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        if (activeKitchen?.id) fetchStock();
-        else if (user?.id && !activeKitchen) {
-            // Fallback if no kitchen selected yet (shouldn't happen with updated context)
-            // fetchStock(user.id); 
-        }
+        if (user?.id) fetchStock();
 
         const onFocus = () => {
-            if (activeKitchen?.id) fetchStock();
+            if (user?.id) fetchStock();
         };
 
         window.addEventListener('focus', onFocus);

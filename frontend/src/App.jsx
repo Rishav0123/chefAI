@@ -17,17 +17,19 @@ import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
 
 const Dashboard = () => {
-    const { user, stockRefreshTrigger } = React.useContext(UserContext);
+    const { user, stockRefreshTrigger, activeKitchen } = React.useContext(UserContext);
     const [stockItems, setStockItems] = useState([]);
     const [fetching, setFetching] = useState(true);
 
     // Fetch stock for metrics
-    // Fetch stock for metrics
     useEffect(() => {
         const fetchData = () => {
-            if (user?.id) {
+            // Use activeKitchen.id if available, otherwise fallback to user.id
+            const targetId = activeKitchen?.id || user?.id;
+
+            if (targetId) {
                 setFetching(true);
-                api.get(`/stock/${user.id}`)
+                api.get(`/stock/${targetId}`)
                     .then(res => {
                         setStockItems(res.data);
                         setFetching(false);
@@ -44,7 +46,7 @@ const Dashboard = () => {
         const onFocus = () => fetchData();
         window.addEventListener('focus', onFocus);
         return () => window.removeEventListener('focus', onFocus);
-    }, [user?.id, stockRefreshTrigger]);
+    }, [user?.id, activeKitchen?.id, stockRefreshTrigger]);
 
     // 1. Capacity: Simple count metric (Target: 20 items = 100%)
     const efficiency = Math.min(Math.round((stockItems.length / 20) * 100), 100);
