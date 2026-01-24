@@ -18,26 +18,28 @@ def extract_items_from_image(image_bytes, mime_type="image/jpeg"):
     base64_image = encode_image(image_bytes)
     
     prompt = """
-    You are a kitchen assistant. Analyze this image (grocery bill, fridge photo, or ingredient shot).
+    You are a smart kitchen assistant. Analyze this image (grocery bill, fridge photo, or ingredient shot).
     Identify all food/grocery items found.
-    
-    IMPORTANT: 
-    - Be lenient. If the image is blurry, give your BEST GUESS. 
-    - Do not fail. If you see *anything* consistent with food, list it.
-    - Ignore prices, tax, and non-food items.
 
-    Return a STRICT JSON object with this structure:
+    CRITICAL RULES:
+    1. **REMOVE Brand Names**: Return ONLY the generic item name. 
+       - "Aachi Chilli Powder" -> "Chilli Powder"
+       - "Amul Butter" -> "Butter"
+       - "Cadbury Dairy Milk" -> "Milk Chocolate"
+    2. **Extract Net Quantity**: If the bill says "1 x Sugar 1kg", the quantity is "1kg", NOT "1". 
+       - If no weight is listed, use "1 pc" or count.
+    3. **Ignore Non-Food**: Do not list detergents, cleaning supplies, or tax/delivery charges.
+
+    Return a STRICT JSON object:
     {
         "items": [
-            {"item_name": "Milk", "quantity": "1L", "category": "dairy"},
-            {"item_name": "Unknown Veg", "quantity": "1", "category": "vegetable"}
+            {"item_name": "Chilli Powder", "quantity": "100g", "category": "spices"},
+            {"item_name": "Button Mushroom", "quantity": "1 pc", "category": "vegetable"},
+            {"item_name": "Onion", "quantity": "1 kg", "category": "vegetable"}
         ],
-        "confidence": 85  // Integer 0-100. How sure are you about these results?
+        "confidence": 85
     }
     
-    If the image is completely unreadable (black screen, floor, etc), return:
-    { "items": [], "confidence": 0 }
-
     RETURN ONLY JSON. NO MARKDOWN.
     """
 
