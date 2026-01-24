@@ -16,6 +16,7 @@ import ScanMethod from './components/ScanMethod';
 import BodyGoals from './components/BodyGoals';
 import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const Dashboard = () => {
     const { user, stockRefreshTrigger, activeKitchen } = React.useContext(UserContext);
@@ -32,11 +33,18 @@ const Dashboard = () => {
                 setFetching(true);
                 api.get(`/stock/${targetId}`)
                     .then(res => {
-                        setStockItems(res.data);
+                        // Defensive check: Ensure it's an array
+                        if (Array.isArray(res.data)) {
+                            setStockItems(res.data);
+                        } else {
+                            console.error("API returned non-array for stock:", res.data);
+                            setStockItems([]);
+                        }
                         setFetching(false);
                     })
                     .catch(err => {
-                        console.error(err);
+                        console.error("Failed to fetch stock:", err);
+                        setStockItems([]); // Fallback to empty
                         setFetching(false);
                     });
             }
@@ -269,7 +277,9 @@ const AppContent = () => {
 const App = () => {
     return (
         <UserProvider>
-            <AppContent />
+            <ErrorBoundary>
+                <AppContent />
+            </ErrorBoundary>
         </UserProvider>
     );
 };

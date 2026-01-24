@@ -57,16 +57,7 @@ app.include_router(kitchens.router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://chef-jfngtelpf-rishavs-projects-42db2f67.vercel.app",
-        "https://chef-n61hg7esr-rishavs-projects-42db2f67.vercel.app",
-        "https://chef-ai-beryl.vercel.app",
-        "https://chefai-m270.onrender.com",
-        "http://localhost",
-        "https://localhost",
-        "capacitor://localhost"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
