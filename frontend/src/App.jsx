@@ -220,6 +220,8 @@ const AppContent = () => {
     const { user, loading } = React.useContext(UserContext);
     const [showLogin, setShowLogin] = useState(false);
 
+    console.log("AppContent Render. Loading:", loading, "User:", user ? user.id : "null");
+
     if (loading) {
         return (
             <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center p-4">
