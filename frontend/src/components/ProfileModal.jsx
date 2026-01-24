@@ -4,7 +4,7 @@ import { UserContext } from '../context/UserContext';
 import api from '../api';
 
 const ProfileModal = ({ isOpen, onClose }) => {
-    const { user, logout } = useContext(UserContext);
+    const { user, logout, triggerStockRefresh } = useContext(UserContext);
     const [loading, setLoading] = useState(false);
 
     // Collapsible state: keys are section IDs, values are boolean
@@ -86,6 +86,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 daily_carbs: formData.daily_carbs ? parseInt(formData.daily_carbs) : null,
                 daily_fat: formData.daily_fat ? parseInt(formData.daily_fat) : null
             });
+            triggerStockRefresh(); // Force dashboard update
             onClose();
         } catch (err) {
             console.error("Error updating profile", err);
