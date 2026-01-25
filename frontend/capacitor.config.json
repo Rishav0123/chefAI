@@ -1,5 +1,12 @@
 {
   "appId": "com.aichef.app",
   "appName": "AI Chef",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "url": "https://chef-ai-beryl.vercel.app/",
+    "cleartext": true,
+    "allowNavigation": [
+      "chef-ai-beryl.vercel.app"
+    ]
+  }
 }

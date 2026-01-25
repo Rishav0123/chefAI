@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Chef AI</title>
+    <!--[if mso]>
+  <style type="text/css">
+    table {border-collapse:collapse;border-spacing:0;margin:0;}
+    div, td {padding:0;}
+    div {margin:0 !important;}
+  </style>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+    <style>
+        /* Dark Mode Defaults */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            background-color: #0c0a09;
+            /* Stone 950 */
+            color: #e7e5e4;
+            /* Stone 200 */
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #0c0a09;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #1c1917;
+            /* Stone 900 */
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #292524;
+            /* Stone 800 */
+        }
+
+        .header {
+            background-color: #1c1917;
+            padding: 40px 0 20px 0;
+            text-align: center;
+        }
+
+        .logo-container {
+            display: inline-block;
+            width: 64px;
+            height: 64px;
+            background-color: #f97316;
+            /* Orange 500 */
+            border-radius: 16px;
+            line-height: 64px;
+            text-align: center;
+            font-size: 32px;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .content {
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        p {
+            margin: 0 0 25px 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #a8a29e;
+            /* Stone 400 */
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #f97316;
+            /* Orange 500 */
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            border-radius: 12px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #ea580c;
+            /* Orange 600 */
+        }
+
+        .footer {
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #57534e;
+            /* Stone 600 */
+            border-top: 1px solid #292524;
+        }
+
+        .link-secondary {
+            color: #f97316;
+            text-decoration: none;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td style="padding: 20px 0 30px 0;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%"
+                        style="max-width: 600px;">
+                        <tr>
+                            <td align="center">
+
+                                <!-- Main Card -->
+                                <div class="container">
+                                    <!-- Header -->
+                                    <div class="header">
+                                        <!-- Placeholder Logo (Chef Hat Icon conceptual) -->
+                                        <div class="logo-container">
+                                            <!-- You can replace this with an <img> tag pointing to a hosted logo -->
+                                            👨‍🍳
+                                        </div>
+                                        <div>
+                                            <span
+                                                style="font-size: 18px; font-weight: bold; color: white; letter-spacing: 1px;">CHEF
+                                                AI</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Content -->
+                                    <div class="content">
+                                        <h1>Confirm Your Email</h1>
+                                        <p>Welcome to the future of cooking! You're just one step away from managing
+                                            your kitchen with AI precision.</p>
+                                        <p>Please confirm your email address to unlock your personal chef.</p>
+
+                                        <!-- Supabase Variable for URL -->
+                                        <a href="{{ .ConfirmationURL }}" class="btn">Confirm Account</a>
+
+                                        <p style="margin-top: 30px; font-size: 14px;">
+                                            Or paste this link in your browser:<br>
+                                            <a href="{{ .ConfirmationURL }}" class="link-secondary">{{ .ConfirmationURL
+                                                }}</a>
+                                        </p>
+                                    </div>
+
+                                    <!-- Footer -->
+                                    <div class="footer">
+                                        <p style="margin: 0;">&copy; 2026 Chef AI. All rights reserved.</p>
+                                        <p style="margin: 5px 0 0 0;">Manage your kitchen smarter.</p>
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
