@@ -5,6 +5,8 @@ import { UserContext } from '../context/UserContext';
 import ProfileModal from './ProfileModal';
 import KitchenManager from './KitchenManager';
 
+import logo from '../assets/logo.png';
+
 const Navbar = () => {
     const { user, logout, kitchens, activeKitchen, switchKitchen, loading } = useContext(UserContext);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -16,8 +18,8 @@ const Navbar = () => {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-950/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
                 <div className="w-full max-w-[1600px] mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform">
-                            <ChefHat size={20} color="white" />
+                        <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform overflow-hidden">
+                            <img src={logo} alt="Chef AI" className="w-full h-full object-cover" />
                         </div>
                         <span className="font-bold text-xl tracking-tight text-white">AI<span className="text-accent">Chef</span></span>
                     </Link>

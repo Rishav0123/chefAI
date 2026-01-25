@@ -1,9 +1,31 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
+import logo from '../assets/logo.png';
+
+import logo from '../assets/logo.png';
 
 const Login = () => {
+    // ... state ...
     const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isSignUp, setIsSignUp] = useState(false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
+
+    const [errorMsg, setErrorMsg] = useState('');
+    const [needsConfirmation, setNeedsConfirmation] = useState(false);
+
+    // ... handlers ...
+
+    // (Skipping handlers for brevity in replacement search block, targeting return)
+
+    // We need to modify the START of the component file to import the logo
+    // But since I can't do two disjoint edits easily without multi_replace, I'll assume the import is added or I'll use a relative path if possible, or just add the import at the top in a separate call if needed.
+    // Wait, replacing a huge block is risky. I'll use multi_replace for Login.jsx to be safe.
+    // Actually, I'll just change the return block part and add the import separately if needed, or use require? No, ES modules.
+    // Let's use multi_replace.
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
@@ -96,6 +118,9 @@ const Login = () => {
     return (
         <div className="w-full max-w-sm mx-auto mt-12 md:mt-20 px-4">
             <div className="glass-panel p-6 md:p-10 text-center">
+                <div className="flex justify-center mb-6">
+                    <img src={logo} alt="Chef AI" className="w-20 h-20 rounded-2xl shadow-2xl shadow-orange-500/20" />
+                </div>
                 <h1 className="text-3xl font-black mb-2 text-white">Kitchen Buddy 🍳</h1>
                 <p className="text-xs text-stone-600 mb-2 font-mono">v2.0 (New Build)</p>
                 <p className="text-stone-400 mb-8">{isSignUp ? 'Create your account' : 'Welcome back, Chef'}</p>
