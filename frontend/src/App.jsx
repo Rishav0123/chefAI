@@ -14,6 +14,7 @@ import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles,
 import MealHistory from './components/MealHistory';
 import ScanMethod from './components/ScanMethod';
 import BodyGoals from './components/BodyGoals';
+import UpdatePassword from './components/UpdatePassword';
 import api from './api';
 import HeroGraphic from './assets/how_it_works_graphic.png';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -265,6 +266,7 @@ const AppContent = () => {
                         <Route path="/chat" element={<ChatAssistant />} />
                         <Route path="/inventory" element={<div className="animate-fade-in"><StockList /></div>} />
                         <Route path="/meals" element={<div className="animate-fade-in"><MealHistory /></div>} />
+                        <Route path="/update-password" element={<UpdatePassword />} />
                     </Routes>
                 </main>
 
