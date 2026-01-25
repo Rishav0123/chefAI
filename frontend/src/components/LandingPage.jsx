@@ -15,8 +15,8 @@ const LandingPage = ({ onGetStarted }) => {
             {/* Navbar */}
             <nav className="relative z-50 container mx-auto px-4 py-4 md:px-6 md:py-6 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 md:w-14 md:h-14 group-hover:scale-110 transition-transform">
-                        <img src={logo} alt="Chef AI" className="w-full h-full object-contain drop-shadow-lg" />
+                    <div className="w-12 h-12 md:w-14 md:h-14 group-hover:scale-110 transition-transform rounded-full overflow-hidden border border-white/5">
+                        <img src={logo} alt="Chef AI" className="w-full h-full object-cover" />
                     </div>
                     <span className="font-bold text-2xl tracking-tight">AI<span className="text-orange-500">Chef</span></span>
                 </div>
