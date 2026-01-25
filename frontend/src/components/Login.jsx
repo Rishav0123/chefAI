@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, X } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 
@@ -100,12 +100,17 @@ const Login = () => {
     };
 
     return (
-        <div className="w-full max-w-sm mx-auto mt-12 md:mt-20 px-4">
-            <div className="glass-panel p-6 md:p-10 text-center">
+        <div className="w-full max-w-sm mx-auto mt-12 md:mt-20 px-4 relative">
+            <div className="glass-panel p-6 md:p-10 text-center relative">
+                <div className="absolute top-4 right-4">
+                    <a href="/" className="text-stone-400 hover:text-white transition-colors">
+                        <X size={24} />
+                    </a>
+                </div>
                 <div className="flex justify-center mb-6">
                     <img src={logo} alt="Chef AI" className="w-20 h-20 rounded-2xl shadow-2xl shadow-orange-500/20" />
                 </div>
-                <h1 className="text-3xl font-black mb-2 text-white">Kitchen Buddy 🍳</h1>
+                <h1 className="text-3xl font-black mb-2 text-white">Chef AI 🍳</h1>
                 <p className="text-xs text-stone-600 mb-2 font-mono">v2.0 (New Build)</p>
                 <p className="text-stone-400 mb-8">{isSignUp ? 'Create your account' : 'Welcome back, Chef'}</p>
 

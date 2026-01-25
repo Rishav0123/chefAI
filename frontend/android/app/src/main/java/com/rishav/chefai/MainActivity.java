@@ -1,4 +1,4 @@
-package com.aichef.app;
+package com.rishav.chefai;
 
 import com.getcapacitor.BridgeActivity;
 
