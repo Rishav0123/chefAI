@@ -18,7 +18,7 @@ const LandingPage = ({ onGetStarted }) => {
                     <div className="w-12 h-12 md:w-14 md:h-14 group-hover:scale-110 transition-transform rounded-full overflow-hidden border border-white/5">
                         <img src={logo} alt="Chef AI" className="w-full h-full object-cover scale-[1.6]" />
                     </div>
-                    <span className="font-bold text-2xl tracking-tight">AI<span className="text-orange-500">Chef</span></span>
+                    <span className="font-bold text-2xl tracking-tight">Chef<span className="text-orange-500">AI</span></span>
                 </div>
                 <button
                     onClick={onGetStarted}
@@ -174,9 +174,9 @@ const LandingPage = ({ onGetStarted }) => {
                 <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-2 opacity-50">
                         <img src={logo} alt="AI Chef" className="w-5 h-5 grayscale" />
-                        <span className="font-bold text-sm">AI Chef</span>
+                        <span className="font-bold text-sm">ChefAI</span>
                     </div>
-                    <p className="text-stone-600 text-sm">© 2024 AI Chef. All rights reserved.</p>
+                    <p className="text-stone-600 text-sm">© 2024 ChefAI. All rights reserved.</p>
                 </div>
             </footer>
         </div>
