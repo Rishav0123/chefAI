@@ -11,6 +11,7 @@ import Login from './components/Login';
 import ChatWidgetButton from './components/ChatWidgetButton';
 import { UserProvider, UserContext } from './context/UserContext';
 import { ShoppingBag, PlusCircle, ScanLine, User as UserIcon, ChefHat, Sparkles, UploadCloud, Camera, Activity, ChevronDown, Home, Users, Flame } from 'lucide-react';
+import logo from './assets/logo.png';
 import MealHistory from './components/MealHistory';
 import ScanMethod from './components/ScanMethod';
 import BodyGoals from './components/BodyGoals';
@@ -162,8 +163,8 @@ const Dashboard = () => {
                     <div className="glass-panel p-6 relative overflow-hidden group flex-1 flex flex-col justify-center items-center text-center min-h-[160px]">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-[40px] -mr-10 -mt-10 transition-all group-hover:bg-green-500/10"></div>
 
-                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
-                            <ChefHat size={24} className="text-stone-500" />
+                        <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3 overflow-hidden">
+                            <img src={logo} alt="Chef" className="w-8 h-8 object-cover opacity-50" />
                         </div>
                         <h3 className="text-stone-300 font-bold mb-1">Recommended Meal</h3>
                         <p className="text-accent text-sm font-medium animate-pulse">Coming Soon</p>
@@ -227,8 +228,8 @@ const AppContent = () => {
                 <div className="relative w-24 h-24 mb-6">
                     <div className="absolute inset-0 border-4 border-stone-800 rounded-full"></div>
                     <div className="absolute inset-0 border-4 border-accent rounded-full border-t-transparent animate-spin"></div>
-                    <div className="absolute inset-0 flex items-center justify-center text-accent">
-                        <ChefHat size={32} />
+                    <div className="absolute inset-0 flex items-center justify-center text-accent overflow-hidden rounded-full p-4">
+                        <img src={logo} alt="Loading..." className="w-full h-full object-contain" />
                     </div>
                 </div>
                 <h2 className="text-xl font-bold text-white mb-2 animate-pulse">Waking up AI Chef...</h2>

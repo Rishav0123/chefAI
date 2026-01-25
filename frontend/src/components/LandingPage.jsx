@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChefHat, Camera, MessageSquare, Activity, ArrowRight, Sparkles, Users, Flame } from 'lucide-react';
 import HeroGraphic from '../assets/how_it_works_graphic.png';
+import logo from '../assets/logo.png';
 
 const LandingPage = ({ onGetStarted }) => {
     return (
@@ -14,8 +15,8 @@ const LandingPage = ({ onGetStarted }) => {
             {/* Navbar */}
             <nav className="relative z-50 container mx-auto px-4 py-4 md:px-6 md:py-6 flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-                        <ChefHat size={20} color="white" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 overflow-hidden">
+                        <img src={logo} alt="Chef AI" className="w-full h-full object-cover" />
                     </div>
                     <span className="font-bold text-xl tracking-tight">AI<span className="text-orange-500">Chef</span></span>
                 </div>
@@ -172,7 +173,7 @@ const LandingPage = ({ onGetStarted }) => {
             <footer className="relative z-10 border-t border-white/5 bg-black/20 backdrop-blur-xl mt-20">
                 <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-2 opacity-50">
-                        <ChefHat size={16} />
+                        <img src={logo} alt="AI Chef" className="w-5 h-5 grayscale" />
                         <span className="font-bold text-sm">AI Chef</span>
                     </div>
                     <p className="text-stone-600 text-sm">© 2024 AI Chef. All rights reserved.</p>
