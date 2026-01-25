@@ -78,6 +78,7 @@ const Login = () => {
         <div className="w-full max-w-sm mx-auto mt-12 md:mt-20 px-4">
             <div className="glass-panel p-6 md:p-10 text-center">
                 <h1 className="text-3xl font-black mb-2 text-white">Kitchen Buddy 🍳</h1>
+                <p className="text-xs text-stone-600 mb-2 font-mono">v2.0 (New Build)</p>
                 <p className="text-stone-400 mb-8">{isSignUp ? 'Create your account' : 'Welcome back, Chef'}</p>
 
                 {!isSignUp && (

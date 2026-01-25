@@ -6,7 +6,8 @@
     "url": "https://chef-ai-beryl.vercel.app/",
     "cleartext": true,
     "allowNavigation": [
-      "chef-ai-beryl.vercel.app"
+      "chef-ai-beryl.vercel.app",
+      "*.vercel.app"
     ]
   }
 }

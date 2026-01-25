@@ -6,7 +6,7 @@ import ProfileModal from './ProfileModal';
 import KitchenManager from './KitchenManager';
 
 const Navbar = () => {
-    const { user, logout, kitchens, activeKitchen, switchKitchen } = useContext(UserContext);
+    const { user, logout, kitchens, activeKitchen, switchKitchen, loading } = useContext(UserContext);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isKitchenMenuOpen, setIsKitchenMenuOpen] = useState(false);
     const [isKitchenManagerOpen, setIsKitchenManagerOpen] = useState(false);
@@ -35,7 +35,10 @@ const Navbar = () => {
                                         <span className="truncate max-w-[120px]">{activeKitchen.name}</span>
                                     </>
                                 ) : (
-                                    <span>Loading...</span>
+                                    <>
+                                        <Home size={16} />
+                                        <span className="truncate max-w-[120px]">{loading ? "Loading..." : "Personal Pantry"}</span>
+                                    </>
                                 )}
                                 <ChevronDown size={14} className="text-stone-500" />
                             </button>
