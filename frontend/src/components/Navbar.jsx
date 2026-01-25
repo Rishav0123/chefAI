@@ -19,7 +19,7 @@ const Navbar = () => {
                 <div className="w-full max-w-[1600px] mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
                     <Link to="/" className="flex items-center gap-3 group">
                         <div className="w-12 h-12 md:w-14 md:h-14 group-hover:scale-110 transition-transform rounded-full overflow-hidden border border-white/5">
-                            <img src={logo} alt="Chef AI" className="w-full h-full object-cover" />
+                            <img src={logo} alt="Chef AI" className="w-full h-full object-cover scale-[1.6]" />
                         </div>
                         <span className="font-bold text-2xl tracking-tight text-white">AI<span className="text-accent">Chef</span></span>
                     </Link>
