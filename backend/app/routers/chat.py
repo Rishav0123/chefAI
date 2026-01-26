@@ -273,137 +273,171 @@ TOOLS = [
     }
 ]
 
-@router.post("/")
-async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
+from fastapi.responses import StreamingResponse
+import json
+
+# ... (Previous imports remain, ensure StreamingResponse is imported)
+
+async def generate_chat_stream(request: ChatRequest, db: Session):
     try:
-        # Ensure user exists for FK constraint
+        # Ensure user exists (Same logic as before)
         user = db.query(User).filter(User.user_id == request.user_id).first()
         if not user:
-            # Create minimal user record
             user = User(user_id=request.user_id, name="Guest User")
             db.add(user)
             db.commit()
 
         # 1. Fetch Chat History
         history = db.query(ChatMessage).filter(ChatMessage.user_id == request.user_id).order_by(ChatMessage.timestamp.desc()).limit(10).all()
-        history.reverse() # Oldest to newest
+        history.reverse()
 
-        # 2. Construct Messages with History
+        # 2. Construct Messages
         conversation_context = [
-            {"role": "system", "content": "You are a helpful Kitchen Assistant. You help users decide what to cook based on their available stock. \n\nBEHAVIOR RULES:\n1. When asked for a recipe, ALWAYS provide the COMPLETE text recipe first. Include a full list of Ingredients and detailed step-by-step Instructions.\n2. **RECIPE CALL-TO-ACTION**: After providing ANY recipe, you MUST explicitly suggest logging it. End your response with a clear instruction like: **\"Type 'I made {Recipe Name}' to save this meal and update your stock!\"**\n3. Do NOT search for a video unless the user explicitly asks for one (e.g., 'show me a video', 'with video').\n4. If the user did NOT ask for a video, end your response with this EXACT suggested action format: `<<VIDEO_SUGGESTION: Show me a video for {Recipe Name}>>`\n5. If the user DOES ask for a video, call the `search_youtube_videos` tool and display the results including thumbnails.\n6. Need Video? Never say 'I will find a video' without actually calling the tool.\n\n7. MEAL LOGGING & TRACKING:\n   - **MULTI-MEAL LOGGING**: If the user lists multiple meals (e.g. 'Overview: Breakfast eggs, Lunch pasta'), you MUST call `log_meal` multiple times — once for each distinct meal.\n   - **CONTEXT AWARENESS**: If the user confirms a meal (e.g., 'I made it', 'I cooked the pasta'), use the ingredients from the *previously suggested recipe* in the conversation history to populate `log_meal`. Do not ask for ingredients again if they are already in the chat context.\n   - **AMBIGUITY**: If the user says they ate something but didn't say who made it, **YOU MUST ASK**: 'Did you cook this at home using your kitchen stock, or did you eat out?'\n   - **EATING OUT**: If the user says they 'ate out', 'ordered in', 'bought it', or 'restaurant', call `log_meal` with `deduct_stock=False`. Estimate nutrition but do NOT deduct ingredients.\n   - **HOME COOKED**: If the user says they 'cooked it', 'made it', or 'used my ingredients', call `log_meal` with `deduct_stock=True`.\n   - **CRITICAL**: For ALL meals (home or out), you MUST estimate nutrition (calories, protein, carbs, fat) and `meal_type`.\n   - **FEEDBACK**: The `log_meal` tool will start a **Action**, redirecting the user to a confirmation page. Inform the user: \"I've pre-filled the log for you. You can review and save it on the next screen.\"\n\n8. ADDING STOCK:\n   - If the user says 'add 2kg rice', 'I bought milk', etc., use the `add_to_stock` tool.\n   - Confirm the addition to the user with the result returned by the tool.\n\n9. MEAL HISTORY:\n   - If the user asks 'what did I eat last week?' or 'show my nutrition stats', use `get_recent_meals`.\n   - Summarize the returned list for the user."},
+             {"role": "system", "content": "You are a helpful Kitchen Assistant. You help users decide what to cook based on their available stock. \n\nBEHAVIOR RULES:\n1. When asked for a recipe, ALWAYS provide the COMPLETE text recipe first. Include a full list of Ingredients and detailed step-by-step Instructions.\n2. **RECIPE CALL-TO-ACTION**: After providing ANY recipe, you MUST explicitly suggest logging it. End your response with a clear instruction like: **\"Type 'I made {Recipe Name}' to save this meal and update your stock!\"**\n3. Do NOT search for a video unless the user explicitly asks for one (e.g., 'show me a video', 'with video').\n4. If the user did NOT ask for a video, end your response with this EXACT suggested action format: `<<VIDEO_SUGGESTION: Show me a video for {Recipe Name}>>`\n5. If the user DOES ask for a video, call the `search_youtube_videos` tool and display the results including thumbnails.\n6. Need Video? Never say 'I will find a video' without actually calling the tool.\n\n7. MEAL LOGGING & TRACKING:\n   - **MULTI-MEAL LOGGING**: If the user lists multiple meals (e.g. 'Overview: Breakfast eggs, Lunch pasta'), you MUST call `log_meal` multiple times — once for each distinct meal.\n   - **CONTEXT AWARENESS**: If the user confirms a meal (e.g., 'I made it', 'I cooked the pasta'), use the ingredients from the *previously suggested recipe* in the conversation history to populate `log_meal`. Do not ask for ingredients again if they are already in the chat context.\n   - **AMBIGUITY**: If the user says they ate something but didn't say who made it, **YOU MUST ASK**: 'Did you cook this at home using your kitchen stock, or did you eat out?'\n   - **EATING OUT**: If the user says they 'ate out', 'ordered in', 'bought it', or 'restaurant', call `log_meal` with `deduct_stock=False`. Estimate nutrition but do NOT deduct ingredients.\n   - **HOME COOKED**: If the user says they 'cooked it', 'made it', or 'used my ingredients', call `log_meal` with `deduct_stock=True`.\n   - **CRITICAL**: For ALL meals (home or out), you MUST estimate nutrition (calories, protein, carbs, fat) and `meal_type`.\n   - **FEEDBACK**: The `log_meal` tool will start a **Action**, redirecting the user to a confirmation page. Inform the user: \"I've pre-filled the log for you. You can review and save it on the next screen.\"\n\n8. ADDING STOCK:\n   - If the user says 'add 2kg rice', 'I bought milk', etc., use the `add_to_stock` tool.\n   - Confirm the addition to the user with the result returned by the tool.\n\n9. MEAL HISTORY:\n   - If the user asks 'what did I eat last week?' or 'show my nutrition stats', use `get_recent_meals`.\n   - Summarize the returned list for the user."},
         ]
         for msg in history:
             conversation_context.append({"role": msg.role, "content": msg.content})
-
-        # Add current user message
+        
         conversation_context.append({"role": "user", "content": request.message})
 
-        # Determine tool choice strategy
+        # Save User Message immediately
+        user_msg_db = ChatMessage(user_id=request.user_id, role="user", content=request.message)
+        db.add(user_msg_db)
+        db.commit()
+
+        # Tool Choice Logic
         tool_choice = "auto"
         if "video" in request.message.lower() or "youtube" in request.message.lower():
             tool_choice = "required"
 
-        # First call to LLM
-        response = client.chat.completions.create(
+        # --- STREAM LOGIC ---
+        stream = client.chat.completions.create(
             model="gpt-4o",
             messages=conversation_context,
             tools=TOOLS,
             tool_choice=tool_choice,
+            stream=True
         )
 
-        response_message = response.choices[0].message
-        tool_calls = response_message.tool_calls
-        
-        # DEBUG LOGGING
-        print(f"DEBUG: Message Content: {response_message.content}")
-        print(f"DEBUG: Tool Calls: {tool_calls}")
+        full_content = ""
+        tool_calls_buffer = {} # {index: {id, name, args_str}}
 
-        final_response_content = response_message.content
+        for chunk in stream:
+            delta = chunk.choices[0].delta
 
-        # Track major actions for frontend
-        actions = []
-        redirect_payloads = []
+            # 1. Handle Tool Calls (Accumulation)
+            if delta.tool_calls:
+                for tc in delta.tool_calls:
+                    idx = tc.index
+                    if idx not in tool_calls_buffer:
+                        tool_calls_buffer[idx] = {"id": tc.id, "name": tc.function.name, "args": ""}
+                    if tc.function.arguments:
+                        tool_calls_buffer[idx]["args"] += tc.function.arguments
 
-        # If tool called
-        if tool_calls:
-            # Append assistant's thinking to context
-            conversation_context.append(response_message)
+            # 2. Handle Text Content
+            if delta.content:
+                full_content += delta.content
+                yield f"data: {json.dumps({'type': 'token', 'content': delta.content})}\n\n"
 
-            for tool_call in tool_calls:
-                function_name = tool_call.function.name
+        # --- PROCESS TOOLS IF ANY ---
+        if tool_calls_buffer:
+            # Yield status
+            yield f"data: {json.dumps({'type': 'status', 'content': 'Checking kitchen assistant...'})}\n\n"
+            
+            # Need to append the "assistant" message with tool_calls to context
+            # Reconstruct the tool_calls object for the context
+            openai_tool_calls_obj = []
+            for idx, tc_data in tool_calls_buffer.items():
+                openai_tool_calls_obj.append({
+                    "id": tc_data["id"],
+                    "type": "function",
+                    "function": {
+                        "name": tc_data["name"],
+                        "arguments": tc_data["args"]
+                    }
+                })
+            
+            conversation_context.append({
+                "role": "assistant",
+                "content": None,
+                "tool_calls": openai_tool_calls_obj
+            })
+
+            # Execute Tools
+            for idx, tc_data in tool_calls_buffer.items():
+                function_name = tc_data["name"]
+                args_str = tc_data["args"]
+                tool_call_id = tc_data["id"]
+
+                try:
+                    args = json.loads(args_str)
+                except:
+                    args = {}
+                
+                function_response = "Error executing tool"
+                
+                # Execute specific tool logic
                 if function_name == "get_kitchen_stock":
-                    function_response = get_stock_tool(request.user_id, db)
+                     yield f"data: {json.dumps({'type': 'status', 'content': 'Checking pantry stock...'})}\n\n"
+                     function_response = get_stock_tool(request.user_id, db)
+                     
                 elif function_name == "search_youtube_videos":
-                    args = json.loads(tool_call.function.arguments)
-                    function_response = search_youtube_tool(args.get("query"))
+                     yield f"data: {json.dumps({'type': 'status', 'content': 'Searching YouTube...'})}\n\n"
+                     function_response = search_youtube_tool(args.get("query"))
+
                 elif function_name == "log_meal":
-                    # DRAFT ONLY - Do not save to DB
-                    args = json.loads(tool_call.function.arguments)
-                    function_response = "Draft created. Redirecting user to review..."
-                    
-                    # Add to actions
-                    if "DRAFT_MEAL" not in actions:
-                        actions.append("DRAFT_MEAL")
-                    redirect_payloads.append(args) 
-                    
+                     yield f"data: {json.dumps({'type': 'action', 'action': 'DRAFT_MEAL', 'payload': args})}\n\n"
+                     function_response = "Draft created. Redirecting user to review..."
+                
                 elif function_name == "add_to_stock":
-                    # DRAFT ONLY - Do not save to DB
-                    args = json.loads(tool_call.function.arguments)
-                    function_response = "Draft created. Redirecting user to review..."
-                    
-                    if "DRAFT_STOCK" not in actions:
-                        actions.append("DRAFT_STOCK")
-                    redirect_payloads.append(args)
+                     yield f"data: {json.dumps({'type': 'action', 'action': 'DRAFT_STOCK', 'payload': args})}\n\n"
+                     function_response = "Draft created. Redirecting user to review..."
+
                 elif function_name == "get_recent_meals":
-                    args = json.loads(tool_call.function.arguments)
-                    function_response = get_recent_meals_tool(
-                        request.user_id,
-                        args.get("days", 7),
-                        db
-                    )
-                else:
-                    function_response = "Tool not found."
-                    
+                     yield f"data: {json.dumps({'type': 'status', 'content': 'Fetching meal history...'})}\n\n"
+                     function_response = get_recent_meals_tool(request.user_id, args.get("days", 7), db)
+
+                # Append tool result to context
                 conversation_context.append({
-                    "tool_call_id": tool_call.id,
+                    "tool_call_id": tool_call_id,
                     "role": "tool",
                     "name": function_name,
-                    "content": function_response,
+                    "content": str(function_response)
                 })
 
-            # Second call to LLM
-            second_response = client.chat.completions.create(
+            # Stream the second response
+            second_stream = client.chat.completions.create(
                 model="gpt-4o",
                 messages=conversation_context,
+                stream=True
             )
-            final_response_content = second_response.choices[0].message.content
-        
-        # 3. Save User Message and Assistant Response to DB
-        user_msg_db = ChatMessage(user_id=request.user_id, role="user", content=request.message)
-        db.add(user_msg_db)
-        
-        # Post-process response to ensure token exists if the polite phrase is used
-        if "Would you like to see a YouTube video" in final_response_content and "<<VIDEO_SUGGESTION:" not in final_response_content:
-            # Attempt to extract recipe name or default to "this recipe"
-            final_response_content = final_response_content.replace(
-                "Would you like to see a YouTube video for this recipe?",
-                "\n\n<<VIDEO_SUGGESTION: Show me a video for this recipe>>"
-            )
-            # Catch-all for variations
-            if "Would you like to see a YouTube video" in final_response_content:
-                 final_response_content += "\n\n<<VIDEO_SUGGESTION: Show me a video for this recipe>>"
+            
+            for chunk in second_stream:
+                if chunk.choices[0].delta.content:
+                    content_chunk = chunk.choices[0].delta.content
+                    full_content += content_chunk
+                    yield f"data: {json.dumps({'type': 'token', 'content': content_chunk})}\n\n"
 
-        assistant_msg_db = ChatMessage(user_id=request.user_id, role="assistant", content=final_response_content)
+        # --- FINALIZATION ---
+        # Post-process for video suggestions (Legacy logic)
+        final_content = full_content
+        if "Would you like to see a YouTube video" in final_content and "<<VIDEO_SUGGESTION:" not in final_content:
+             suffix = "\n\n<<VIDEO_SUGGESTION: Show me a video for this recipe>>"
+             final_content += suffix
+             yield f"data: {json.dumps({'type': 'token', 'content': suffix})}\n\n"
+
+        # Save Assistant Message
+        assistant_msg_db = ChatMessage(user_id=request.user_id, role="assistant", content=final_content)
         db.add(assistant_msg_db)
-        
         db.commit()
-
-        return {
-            "response": final_response_content,
-            "actions": actions,
-            "redirect_payloads": redirect_payloads
-        }
+        
+        # Done
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
     except Exception as e:
-        print(f"Error in chat: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Stream Error: {e}")
+        yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+
+@router.post("/")
+async def chat_with_chef(request: ChatRequest, db: Session = Depends(get_db)):
+    return StreamingResponse(generate_chat_stream(request, db), media_type="text/event-stream")
