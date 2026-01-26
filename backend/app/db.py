@@ -47,14 +47,24 @@ else:
         "keepalives_count": 5
     }
 
+# Construct engine arguments dinamically
+engine_kwargs = {
+    "connect_args": connect_args,
+    "poolclass": pool_class
+}
+
+# Only add pool settings if using QueuePool (Render)
+if pool_class == QueuePool:
+    engine_kwargs.update({
+        "pool_size": pool_size,
+        "max_overflow": max_overflow,
+        "pool_timeout": pool_timeout,
+        "pool_recycle": pool_recycle
+    })
+
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
-    connect_args=connect_args,
-    poolclass=pool_class,
-    pool_size=pool_size,
-    max_overflow=max_overflow,
-    pool_timeout=pool_timeout,
-    pool_recycle=pool_recycle
+    **engine_kwargs
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
