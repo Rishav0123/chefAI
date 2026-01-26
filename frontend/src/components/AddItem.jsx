@@ -390,12 +390,15 @@ const AddItem = () => {
                 if (mealsToSave.length === 0) return;
 
                 // DEBUG: Check activeKitchen
-                alert(`Saving Meal. Active Kitchen: ${activeKitchen?.name} (ID: ${activeKitchen?.id})`);
+                const kitchenIdToUse = activeKitchen?.id || null;
+                const kitchenName = activeKitchen?.name || "Personal Workspace";
+
+                // alert(`Saving Meal. Active Kitchen: ${kitchenName} (ID: ${kitchenIdToUse})`);
 
                 await Promise.all(mealsToSave.map(meal => {
                     return api.post('/meals/', {
                         user_id: user.id,
-                        kitchen_id: activeKitchen?.id, // Link meal log (and deduction) to active kitchen
+                        kitchen_id: kitchenIdToUse, // Link meal log (and deduction) to active kitchen
                         name: meal.name,
                         meal_type: meal.meal_type,
                         meal_source: meal.meal_source,

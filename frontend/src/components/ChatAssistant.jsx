@@ -60,35 +60,74 @@ const ChatAssistant = () => {
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setLoading(true);
 
+        // Add empty assistant message to start streaming into
+        setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
         try {
-            const res = await api.post('/chat/', {
-                message: userMsg,
-                user_id: user.id
+            // Using fetch instead of axios for streaming support
+            const response = await fetch(`${api.defaults.baseURL}/chat/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: userMsg,
+                    user_id: user.id
+                })
             });
 
-            setMessages(prev => [...prev, { role: 'assistant', content: res.data.response }]);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let assistantMessage = "";
 
-            // Check for backend actions
-            if (res.data.actions && res.data.actions.includes("MEAL_LOGGED")) {
-                showToast("🍲 Kitchen Updated! Ingredients removed from stock.");
-                triggerStockRefresh();
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(6));
+
+                            if (data.type === 'token') {
+                                assistantMessage += data.content;
+                                setMessages(prev => {
+                                    const newMsgs = [...prev];
+                                    newMsgs[newMsgs.length - 1] = {
+                                        role: 'assistant',
+                                        content: assistantMessage
+                                    };
+                                    return newMsgs;
+                                });
+                            } else if (data.type === 'status') {
+                                // Optional: Show a "Thinking..." toast or status line
+                                // console.log("Status:", data.content);
+                            } else if (data.type === 'action') {
+                                if (data.action === "DRAFT_MEAL") {
+                                    showToast("📝 Opening Meal Log...");
+                                    setTimeout(() => {
+                                        navigate('/add?mode=meal', { state: { drafts: [data.payload] } });
+                                    }, 1500);
+                                } else if (data.action === "DRAFT_STOCK") {
+                                    showToast("📦 Opening Stock Entry...");
+                                    setTimeout(() => {
+                                        navigate('/add?mode=stock', { state: { stockDrafts: [data.payload] } });
+                                    }, 1500);
+                                }
+                            } else if (data.type === 'error') {
+                                console.error("Stream error:", data.content);
+                                assistantMessage += "\n\n*[Error: " + data.content + "]*";
+                            }
+                        } catch (e) {
+                            console.error("Error parsing stream chunk", e);
+                        }
+                    }
+                }
             }
 
-            if (res.data.actions && res.data.actions.includes("DRAFT_MEAL") && res.data.redirect_payloads) {
-                showToast("📝 Opening Meal Log...");
-                // Small delay to let user see the "Draft created" message
-                setTimeout(() => {
-                    navigate('/add?mode=meal', { state: { drafts: res.data.redirect_payloads } });
-                }, 1500);
-            }
-
-            if (res.data.actions && res.data.actions.includes("DRAFT_STOCK") && res.data.redirect_payloads) {
-                showToast("📦 Opening Stock Entry...");
-                // Small delay to let user see the "Draft created" message
-                setTimeout(() => {
-                    navigate('/add?mode=stock', { state: { stockDrafts: res.data.redirect_payloads } });
-                }, 1500);
-            }
         } catch (error) {
             console.error(error);
             setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting to the kitchen server. Please try again." }]);
