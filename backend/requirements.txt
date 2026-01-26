@@ -11,3 +11,4 @@ mcp
 psycopg2-binary
 supabase
 youtube-search-python
+redis

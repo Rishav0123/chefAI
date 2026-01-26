@@ -3,19 +3,16 @@ from sqlalchemy.orm import Session
 from ..db import get_db, SessionLocal
 from ..models.kitchen import KitchenStock, User, Uploads
 from ..services.ocr import extract_items_from_image, extract_meal_from_image
+from ..services.job_store import job_store
 import json
 import uuid
 import time
 
 router = APIRouter(prefix="/upload", tags=["upload"])
 
-# In-memory job store: { "job_id": { "status": "processing" | "completed" | "error", "data": ..., "error": ... } }
-# In a production app, use Redis/Database
-ACTIVE_JOBS = {}
-
 def process_upload_background(job_id: str, contents: bytes, user_id: str, upload_type: str, filename: str, content_type: str):
     print(f"[Job {job_id}] Starting background processing for {user_id}")
-    ACTIVE_JOBS[job_id]["status"] = "processing"
+    job_store.update_status(job_id, "processing")
     
     # Create a new DB session for this background thread
     db = SessionLocal()
@@ -70,15 +67,13 @@ def process_upload_background(job_id: str, contents: bytes, user_id: str, upload
         print(f"[Job {job_id}] Transaction committed.")
         
         # Update Job Status
-        ACTIVE_JOBS[job_id]["status"] = "completed"
-        ACTIVE_JOBS[job_id]["data"] = extracted_data
+        job_store.update_status(job_id, "completed", result=extracted_data)
 
     except Exception as e:
         import traceback
         traceback.print_exc()
         print(f"[Job {job_id}] Error: {e}")
-        ACTIVE_JOBS[job_id]["status"] = "error"
-        ACTIVE_JOBS[job_id]["error"] = str(e)
+        job_store.update_status(job_id, "error", error=str(e))
     finally:
         db.close()
 
@@ -100,10 +95,11 @@ async def upload_file(
         
         # 2. Assign Job ID
         job_id = str(uuid.uuid4())
-        ACTIVE_JOBS[job_id] = {
+        initial_job_state = {
             "status": "pending",
             "created_at": time.time()
         }
+        job_store.save_job(job_id, initial_job_state)
         
         # 3. Queue Background Task
         background_tasks.add_task(
@@ -130,7 +126,7 @@ async def upload_file(
 
 @router.get("/status/{job_id}")
 async def get_upload_status(job_id: str):
-    job = ACTIVE_JOBS.get(job_id)
+    job = job_store.get_job(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
