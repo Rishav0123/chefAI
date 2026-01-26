@@ -20,19 +20,41 @@ else:
     # We use QueuePool (default) instead of NullPool to maintain open connections.
     # This prevents the overhead of opening/closing TCP/SSL connections for every request.
     
-    # --- REVERTED TO NULLPOOL (STABILITY FIX) ---
-    # The local network environment seems to block or drop persistent connections to Supabase (port 5432).
-    # We revert to NullPool to ensure every request opens a fresh connection. This is slower but reliable.
-    
-    pool_class = NullPool
+    # --- SMART POOLING CONFIGURATION ---
+    # Render/Production: Use QueuePool for performance (keep connections open)
+    # Local/Windows: Use NullPool for stability (avoid firewall/ISP timeouts)
+    if os.getenv("RENDER"):
+        print("Running on Render: Using QueuePool", flush=True)
+        pool_class = QueuePool
+        pool_size = 5
+        max_overflow = 10
+        pool_timeout = 30
+        pool_recycle = 300
+    else:
+        print("Running Locally: Using NullPool", flush=True)
+        pool_class = NullPool
+        pool_size = None
+        max_overflow = None
+        pool_timeout = None
+        pool_recycle = None
     
     # Increase timeout to handle Supabase cold starts
-    connect_args = {"connect_timeout": 60}
+    connect_args = {
+        "connect_timeout": 60, 
+        "keepalives": 1, 
+        "keepalives_idle": 30, 
+        "keepalives_interval": 10, 
+        "keepalives_count": 5
+    }
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
     connect_args=connect_args,
-    poolclass=pool_class
+    poolclass=pool_class,
+    pool_size=pool_size,
+    max_overflow=max_overflow,
+    pool_timeout=pool_timeout,
+    pool_recycle=pool_recycle
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
